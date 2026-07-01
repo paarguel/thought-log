@@ -14,8 +14,7 @@ test("mobile worksheet can reach local save options", async ({ page }) => {
   await page.getByRole("button", { name: "Mind reading" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByRole("tab", { name: "Original Text" })).toHaveAttribute("aria-selected", "true");
-  await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByLabel("Realistic / rational thought").fill("I do not know what others are thinking.");
+  await page.getByLabel("Response to original text").fill("I do not know what others are thinking.");
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByRole("button", { name: "Save on this device" })).toBeVisible();
   await page.getByRole("button", { name: "Save on this device" }).click();
@@ -35,22 +34,22 @@ test("mobile worksheet can mark a manually selected passage thought", async ({ p
   await page.getByLabel("Thought passage").fill("Everyone thinks I am weird. I always do this.");
   await page.getByRole("button", { name: "Continue" }).click();
 
-  await page.getByLabel("Thought passage for selection").evaluate((passage) => {
-    const textNode = passage.firstChild;
-    if (!textNode) {
-      throw new Error("Passage text was not rendered");
-    }
+  const firstToken = page.locator("[data-token-index='0']");
+  const lastToken = page.locator("[data-token-index='4']");
+  const firstBox = await firstToken.boundingBox();
+  const lastBox = await lastToken.boundingBox();
 
-    const range = document.createRange();
-    range.setStart(textNode, 0);
-    range.setEnd(textNode, "Everyone thinks I am weird".length);
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-  });
+  if (!firstBox || !lastBox) {
+    throw new Error("Passage tokens were not visible");
+  }
+
+  await page.mouse.move(firstBox.x + 4, firstBox.y + firstBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(lastBox.x + lastBox.width - 4, lastBox.y + lastBox.height / 2, { steps: 8 });
+  await page.mouse.up();
 
   await page.getByRole("button", { name: "Mark selection" }).click();
 
   await expect(page.getByText("1 marked")).toBeVisible();
-  await expect(page.locator("mark.marked")).toHaveText("Everyone thinks I am weird");
+  await expect(page.locator(".word-token-marked")).toHaveCount(5);
 });

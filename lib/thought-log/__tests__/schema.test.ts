@@ -5,7 +5,8 @@ import { thoughtLogEntrySchema } from "../schema";
 describe("thoughtLogEntrySchema", () => {
   it("validates a finalized empty worksheet", () => {
     const entry = finalizeDraft(createEmptyThoughtLogDraft());
-    expect(thoughtLogEntrySchema.parse(entry).schemaVersion).toBe(1);
+    expect(thoughtLogEntrySchema.parse(entry).schemaVersion).toBe(2);
+    expect(thoughtLogEntrySchema.parse(entry).rationalResponses).toEqual([]);
   });
 
   it("rejects invalid distortion ids", () => {

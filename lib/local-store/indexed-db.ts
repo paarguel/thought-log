@@ -36,7 +36,13 @@ const withStore = async <T>(mode: IDBTransactionMode, callback: (store: IDBObjec
 
 export const saveLocalEntry = (entry: ThoughtLogEntry) => withStore("readwrite", (store) => store.put(entry));
 
-export const listLocalEntries = () => withStore<ThoughtLogEntry[]>("readonly", (store) => store.getAll());
+export const listLocalEntries = async () => {
+  const entries = await withStore<ThoughtLogEntry[]>("readonly", (store) => store.getAll());
+  return entries.map((entry) => ({
+    ...entry,
+    rationalResponses: entry.rationalResponses ?? [],
+  }));
+};
 
 export const deleteLocalEntry = (id: string) => withStore("readwrite", (store) => store.delete(id));
 

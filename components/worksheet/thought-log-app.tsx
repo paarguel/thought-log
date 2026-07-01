@@ -8,13 +8,12 @@ import { FeelingsStep } from "./feelings-step";
 import { ThoughtPassageStep } from "./thought-passage-step";
 import { PhraseExtractionStep } from "./phrase-extraction-step";
 import { LabelingStep } from "./labeling-step";
-import { ReviewStep } from "./review-step";
 import { RationalThoughtStep } from "./rational-thought-step";
 import { SaveOptions } from "./save-options";
 import { StepFooter } from "./step-footer";
 import { printEntryWorksheet } from "@/lib/local-store/export";
 
-const steps = ["situation", "feelings", "thoughts", "extract", "label", "review", "rational", "save"] as const;
+const steps = ["situation", "feelings", "thoughts", "extract", "label", "rational", "save"] as const;
 
 export function ThoughtLogApp() {
   const [draft, setDraft] = useState<ThoughtLogDraft>(() => createEmptyThoughtLogDraft());
@@ -49,8 +48,14 @@ export function ThoughtLogApp() {
             {current === "label" && (
               <LabelingStep thoughts={draft.extractedThoughts} assignments={draft.labelAssignments} onChange={(labelAssignments) => update({ labelAssignments })} />
             )}
-            {current === "review" && <ReviewStep draft={draft} onModeChange={(reviewModeLastUsed) => update({ reviewModeLastUsed })} />}
-            {current === "rational" && <RationalThoughtStep draft={draft} onChange={(rationalThought) => update({ rationalThought })} />}
+            {current === "rational" && (
+              <RationalThoughtStep
+                draft={draft}
+                onModeChange={(reviewModeLastUsed) => update({ reviewModeLastUsed })}
+                onFullChange={(rationalThought) => update({ rationalThought })}
+                onResponsesChange={(rationalResponses) => update({ rationalResponses })}
+              />
+            )}
             {current === "save" && <SaveOptions entry={entry} />}
           </div>
           <StepFooter

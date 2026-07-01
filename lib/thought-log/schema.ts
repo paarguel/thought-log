@@ -14,6 +14,11 @@ export const labelAssignmentSchema = z.object({
   distortionIds: z.array(z.enum(distortionIds as [string, ...string[]])),
 });
 
+export const rationalResponseSchema = z.object({
+  thoughtId: z.string().min(1),
+  text: z.string(),
+});
+
 export const thoughtLogEntrySchema = z.object({
   id: z.string().min(1),
   createdAt: z.string().datetime(),
@@ -25,6 +30,7 @@ export const thoughtLogEntrySchema = z.object({
   extractedThoughts: z.array(extractedThoughtSchema),
   labelAssignments: z.array(labelAssignmentSchema),
   rationalThought: z.string(),
+  rationalResponses: z.array(rationalResponseSchema).default([]),
   reviewModeLastUsed: z.enum(["original", "all", "one"]),
-  schemaVersion: z.literal(1),
+  schemaVersion: z.union([z.literal(1), z.literal(2)]),
 });

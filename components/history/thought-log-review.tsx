@@ -70,7 +70,30 @@ export function ThoughtLogReview({ entry, onClose }: ThoughtLogReviewProps) {
 
       <div className="review-block">
         <h3>Realistic / rational thought</h3>
-        <p>{entry.rationalThought || "No rational thought entered."}</p>
+        <p>
+          {entry.rationalThought ||
+            ((entry.rationalResponses?.length ?? 0) > 0 ? "See one-by-one responses below." : "No rational thought entered.")}
+        </p>
+        {(entry.rationalResponses?.length ?? 0) > 0 && (
+          <div className="review-thought-list">
+            {entry.extractedThoughts.map((thought, index) => {
+              const response = entry.rationalResponses?.find((item) => item.thoughtId === thought.id)?.text;
+              if (!response) {
+                return null;
+              }
+
+              return (
+                <article className="review-thought" key={`response-${thought.id}`}>
+                  <span className="thought-number">{index + 1}</span>
+                  <div>
+                    <strong>{thought.text}</strong>
+                    <p>{response}</p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div className="action-row">

@@ -73,7 +73,7 @@ export function HistoryPage() {
                 <article className="history-item" key={entry.id}>
                   <strong>{entry.title}</strong>
                   <span className="muted">{new Date(entry.createdAt).toLocaleString()}</span>
-                  <p>{entry.rationalThought || entry.thoughtText || entry.situation}</p>
+                  <p>{getEntryPreview(entry)}</p>
                   <div className="action-row">
                     <button className="secondary-button" type="button" onClick={() => setSelectedEntry(entry)}>
                       Review
@@ -105,3 +105,6 @@ export function HistoryPage() {
 }
 
 const sortEntries = (entries: ThoughtLogEntry[]) => entries.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+const getEntryPreview = (entry: ThoughtLogEntry) =>
+  entry.rationalThought || entry.rationalResponses?.find((response) => response.text.trim())?.text || entry.thoughtText || entry.situation;

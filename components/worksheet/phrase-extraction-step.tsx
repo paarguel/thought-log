@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { Check, Wand2 } from "lucide-react";
 import type { ExtractedThought } from "@/lib/thought-log/types";
 import { createManualThought, segmentThoughts } from "@/lib/thought-log/segmenter";
@@ -11,60 +11,77 @@ type PhraseExtractionStepProps = {
   onChange: (thoughts: ExtractedThought[]) => void;
 };
 
-type PendingSelection = {
+type WordToken = {
+  index: number;
   start: number;
   end: number;
+  text: string;
+};
+
+type TokenSelection = {
+  anchor: number;
+  focus: number;
 };
 
 export function PhraseExtractionStep({ thoughtText, thoughts, onChange }: PhraseExtractionStepProps) {
   const passageRef = useRef<HTMLDivElement>(null);
-  const pendingSelectionRef = useRef<PendingSelection | null>(null);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [tokenSelection, setTokenSelection] = useState<TokenSelection | null>(null);
+  const tokens = useMemo(() => createWordTokens(thoughtText), [thoughtText]);
+  const selectedBounds = tokenSelection ? getSelectionBounds(tokenSelection, tokens) : null;
 
-  useEffect(() => {
-    pendingSelectionRef.current = null;
-  }, [thoughtText]);
+  const updateFocusFromPoint = (clientX: number, clientY: number) => {
+    const target = document.elementFromPoint(clientX, clientY);
+    const tokenElement = target instanceof HTMLElement ? target.closest<HTMLElement>("[data-token-index]") : null;
 
-  const readPassageSelection = (): PendingSelection | null => {
-    const selection = window.getSelection();
-    const selectedText = selection?.toString().trim();
-
-    if (!selection || !selectedText) {
-      return null;
+    if (!tokenElement || !passageRef.current?.contains(tokenElement)) {
+      return;
     }
 
-    const selectedRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
-    const selectionBelongsToPassage =
-      !selectedRange || !passageRef.current || passageRef.current.contains(selectedRange.commonAncestorContainer);
-
-    if (!selectionBelongsToPassage) {
-      return null;
+    const tokenIndex = Number(tokenElement.dataset.tokenIndex);
+    if (Number.isNaN(tokenIndex)) {
+      return;
     }
 
-    const start = thoughtText.indexOf(selectedText);
-    if (start < 0) {
-      return null;
-    }
-
-    return { start, end: start + selectedText.length };
+    setTokenSelection((current) => (current ? { ...current, focus: tokenIndex } : current));
   };
 
-  const rememberSelection = () => {
-    const selection = readPassageSelection();
-    if (selection) {
-      pendingSelectionRef.current = selection;
+  const startTokenSelection = (tokenIndex: number, event: PointerEvent<HTMLSpanElement>) => {
+    event.preventDefault();
+    event.currentTarget.parentElement?.setPointerCapture?.(event.pointerId);
+    window.getSelection()?.removeAllRanges();
+    setIsSelecting(true);
+    setTokenSelection({ anchor: tokenIndex, focus: tokenIndex });
+  };
+
+  const updateTokenSelection = (event: PointerEvent<HTMLDivElement>) => {
+    if (!isSelecting) {
+      return;
+    }
+
+    updateFocusFromPoint(event.clientX, event.clientY);
+  };
+
+  const finishTokenSelection = (event: PointerEvent<HTMLDivElement>) => {
+    if (!isSelecting) {
+      return;
+    }
+
+    updateFocusFromPoint(event.clientX, event.clientY);
+    setIsSelecting(false);
+
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
     }
   };
 
   const confirmSelection = () => {
-    const selection = readPassageSelection() ?? pendingSelectionRef.current;
-
-    if (!selection) {
+    if (!selectedBounds) {
       return;
     }
 
-    onChange([...thoughts, createManualThought(thoughtText, selection.start, selection.end)]);
-    pendingSelectionRef.current = null;
-    window.getSelection()?.removeAllRanges();
+    onChange([...thoughts, createManualThought(thoughtText, selectedBounds.start, selectedBounds.end)]);
+    setTokenSelection(null);
   };
 
   const autoChoose = () => {
@@ -72,11 +89,19 @@ export function PhraseExtractionStep({ thoughtText, thoughts, onChange }: Phrase
       return;
     }
 
+    setTokenSelection(null);
     onChange(segmentThoughts(thoughtText));
   };
 
-  const undoLast = () => onChange(thoughts.slice(0, -1));
-  const clearSelection = () => window.getSelection()?.removeAllRanges();
+  const undoLast = () => {
+    setTokenSelection(null);
+    onChange(thoughts.slice(0, -1));
+  };
+
+  const clearSelection = () => {
+    setTokenSelection(null);
+    window.getSelection()?.removeAllRanges();
+  };
 
   return (
     <section>
@@ -89,16 +114,16 @@ export function PhraseExtractionStep({ thoughtText, thoughts, onChange }: Phrase
       </div>
       <div
         ref={passageRef}
-        className="passage-box"
+        className="passage-box selectable-passage"
         aria-label="Thought passage for selection"
-        onKeyUp={rememberSelection}
-        onMouseUp={rememberSelection}
-        onTouchEnd={rememberSelection}
+        onPointerMove={updateTokenSelection}
+        onPointerUp={finishTokenSelection}
+        onPointerCancel={finishTokenSelection}
       >
-        {renderMarkedText(thoughtText, thoughts)}
+        {renderSelectableText(thoughtText, tokens, thoughts, tokenSelection, startTokenSelection)}
       </div>
       <div className="action-row">
-        <button type="button" className="primary-button" onClick={confirmSelection}>
+        <button type="button" className={`primary-button${selectedBounds ? " cta-glow" : ""}`} onClick={confirmSelection} disabled={!selectedBounds}>
           <Check size={18} aria-hidden="true" /> Mark selection
         </button>
         <button type="button" className="secondary-button" onClick={autoChoose}>
@@ -115,25 +140,73 @@ export function PhraseExtractionStep({ thoughtText, thoughts, onChange }: Phrase
   );
 }
 
-const renderMarkedText = (text: string, thoughts: ExtractedThought[]) => {
-  if (thoughts.length === 0) {
+const createWordTokens = (text: string): WordToken[] => {
+  const tokens: WordToken[] = [];
+  const matcher = /\S+/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = matcher.exec(text)) !== null) {
+    tokens.push({
+      index: tokens.length,
+      start: match.index,
+      end: match.index + match[0].length,
+      text: match[0],
+    });
+  }
+
+  return tokens;
+};
+
+const getSelectionBounds = (selection: TokenSelection, tokens: WordToken[]) => {
+  const firstIndex = Math.min(selection.anchor, selection.focus);
+  const lastIndex = Math.max(selection.anchor, selection.focus);
+  const first = tokens[firstIndex];
+  const last = tokens[lastIndex];
+
+  if (!first || !last) {
+    return null;
+  }
+
+  return { firstIndex, lastIndex, start: first.start, end: last.end };
+};
+
+const tokenOverlapsThought = (token: WordToken, thoughts: ExtractedThought[]) =>
+  thoughts.some((thought) => token.start < thought.end && token.end > thought.start);
+
+const renderSelectableText = (
+  text: string,
+  tokens: WordToken[],
+  thoughts: ExtractedThought[],
+  selection: TokenSelection | null,
+  onPointerDown: (tokenIndex: number, event: PointerEvent<HTMLSpanElement>) => void,
+) => {
+  if (tokens.length === 0) {
     return text;
   }
 
-  const sorted = [...thoughts].sort((a, b) => a.start - b.start);
-  const parts: React.ReactNode[] = [];
+  const selectedBounds = selection ? getSelectionBounds(selection, tokens) : null;
+  const parts: ReactNode[] = [];
   let cursor = 0;
 
-  sorted.forEach((thought) => {
-    if (thought.start > cursor) {
-      parts.push(text.slice(cursor, thought.start));
+  tokens.forEach((token) => {
+    if (token.start > cursor) {
+      parts.push(text.slice(cursor, token.start));
     }
+
+    const selected = selectedBounds ? token.index >= selectedBounds.firstIndex && token.index <= selectedBounds.lastIndex : false;
+    const marked = tokenOverlapsThought(token, thoughts);
+
     parts.push(
-      <mark className="marked" key={thought.id}>
-        {text.slice(thought.start, thought.end)}
-      </mark>,
+      <span
+        className={`word-token${selected ? " word-token-selected" : ""}${marked ? " word-token-marked" : ""}`}
+        data-token-index={token.index}
+        key={`${token.start}-${token.end}`}
+        onPointerDown={(event) => onPointerDown(token.index, event)}
+      >
+        {text.slice(token.start, token.end)}
+      </span>,
     );
-    cursor = thought.end;
+    cursor = token.end;
   });
 
   if (cursor < text.length) {

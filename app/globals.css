@@ -130,6 +130,11 @@ a {
   border-color: var(--sage);
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .primary-button {
   width: 100%;
   border-radius: 8px;
@@ -160,7 +165,7 @@ a {
 
 .step-area {
   flex: 1;
-  padding: 18px 16px 120px;
+  padding: 18px 16px 24px;
 }
 
 .step-kicker {
@@ -228,11 +233,9 @@ a {
 }
 
 .step-footer {
-  position: fixed;
+  position: sticky;
   bottom: 0;
-  left: 50%;
-  width: min(100%, 520px);
-  transform: translateX(-50%);
+  width: 100%;
   padding: 12px 16px 16px;
   display: grid;
   grid-template-columns: 1fr 2fr;
@@ -265,6 +268,34 @@ a {
   white-space: pre-wrap;
   user-select: text;
   -webkit-user-select: text;
+}
+
+.selectable-passage {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.word-token {
+  display: inline;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 120ms ease, box-shadow 120ms ease;
+}
+
+.word-token-selected {
+  background: var(--sky);
+  box-shadow: 0 0 0 2px var(--sky);
+}
+
+.word-token-marked {
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold);
+}
+
+.word-token-selected.word-token-marked {
+  background: #d9eef5;
+  box-shadow: 0 0 0 2px var(--focus);
 }
 
 .marked {
@@ -446,12 +477,56 @@ a {
 }
 
 .pattern-pill {
+  display: inline-grid;
+  gap: 2px;
   border-radius: 999px;
   background: var(--sky);
   color: #244657;
   padding: 4px 8px;
   font-size: 0.82rem;
   font-weight: 700;
+}
+
+.response-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.pattern-definition-list {
+  display: grid;
+  gap: 8px;
+}
+
+.pattern-definition {
+  display: grid;
+  gap: 2px;
+  border-left: 3px solid var(--sky);
+  padding-left: 8px;
+}
+
+.pattern-definition small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.writing-context {
+  display: grid;
+  gap: 10px;
+}
+
+.writing-context h2 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.writing-context p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.one-by-one-context {
+  border-color: var(--sage);
 }
 
 .section-gap {

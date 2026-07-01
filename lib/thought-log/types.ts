@@ -23,6 +23,11 @@ export type LabelAssignment = {
   distortionIds: DistortionId[];
 };
 
+export type RationalResponse = {
+  thoughtId: string;
+  text: string;
+};
+
 export type ReviewMode = "original" | "all" | "one";
 
 export type ThoughtLogEntry = {
@@ -36,8 +41,9 @@ export type ThoughtLogEntry = {
   extractedThoughts: ExtractedThought[];
   labelAssignments: LabelAssignment[];
   rationalThought: string;
+  rationalResponses: RationalResponse[];
   reviewModeLastUsed: ReviewMode;
-  schemaVersion: 1;
+  schemaVersion: 1 | 2;
 };
 
 export type ThoughtLogDraft = Omit<ThoughtLogEntry, "createdAt" | "updatedAt">;
@@ -51,8 +57,9 @@ export const createEmptyThoughtLogDraft = (): ThoughtLogDraft => ({
   extractedThoughts: [],
   labelAssignments: [],
   rationalThought: "",
+  rationalResponses: [],
   reviewModeLastUsed: "original",
-  schemaVersion: 1,
+  schemaVersion: 2,
 });
 
 export const finalizeDraft = (draft: ThoughtLogDraft): ThoughtLogEntry => {

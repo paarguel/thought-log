@@ -56,4 +56,17 @@ describe("export helpers", () => {
     expect(text).toContain("Patterns: Mind reading");
     expect(text).toContain("Realistic / Rational Thoughts\nI can stay grounded.");
   });
+
+  it("includes one-by-one rational responses in exports", () => {
+    const entry = finalizeDraft({
+      ...createEmptyThoughtLogDraft(),
+      situation: "At a social gathering",
+      thoughtText: "Everyone thinks I am weird.",
+      extractedThoughts: [{ id: "thought-1", text: "Everyone thinks I am weird.", start: 0, end: 27, source: "manual" }],
+      rationalResponses: [{ thoughtId: "thought-1", text: "I cannot know what people are thinking." }],
+    });
+
+    expect(createPrintableHtml(entry)).toContain("I cannot know what people are thinking.");
+    expect(createReadableTextExport(entry)).toContain("One-by-one responses");
+  });
 });

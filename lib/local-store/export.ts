@@ -42,6 +42,9 @@ const getLabelText = (entry: ThoughtLogEntry, thoughtId: string) => {
   return labels || "Unlabeled";
 };
 
+const getResponseText = (entry: ThoughtLogEntry, thoughtId: string) =>
+  entry.rationalResponses?.find((response) => response.thoughtId === thoughtId)?.text.trim() ?? "";
+
 const createMarkedThoughtPassage = (entry: ThoughtLogEntry) => {
   if (entry.extractedThoughts.length === 0) {
     return escapeHtml(entry.thoughtText || "No thought passage entered.");
@@ -93,6 +96,30 @@ const createThoughtLabelRows = (entry: ThoughtLogEntry) => {
       </article>`;
     })
     .join("");
+};
+
+const createRationalThoughtRows = (entry: ThoughtLogEntry) => {
+  const fullResponse = entry.rationalThought.trim();
+  const responseRows =
+    entry.extractedThoughts
+      .map((thought, index) => {
+        const response = getResponseText(entry, thought.id);
+        if (!response) {
+          return "";
+        }
+
+        return `<article class="response-row">
+          <p class="response-label">${index + 1}. ${escapeHtml(thought.text)}</p>
+          <p>${escapeHtml(response)}</p>
+        </article>`;
+      })
+      .join("") || "";
+
+  if (!fullResponse && !responseRows) {
+    return "No rational thought entered.";
+  }
+
+  return `${fullResponse ? `<p>${escapeHtml(fullResponse)}</p>` : ""}${responseRows ? `<div class="response-list">${responseRows}</div>` : ""}`;
 };
 
 export const createPrintableHtml = (entry: ThoughtLogEntry) => {
@@ -224,6 +251,23 @@ export const createPrintableHtml = (entry: ThoughtLogEntry) => {
       color: #5c625c;
       font-size: 12px;
     }
+    .response-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .response-row {
+      display: grid;
+      gap: 4px;
+      padding-top: 10px;
+      border-top: 1px solid #d9d3c8;
+      break-inside: avoid;
+    }
+    .response-label {
+      color: #5c625c;
+      font-size: 12px;
+      font-weight: 700;
+    }
     .print-actions {
       display: flex;
       justify-content: flex-end;
@@ -276,7 +320,7 @@ export const createPrintableHtml = (entry: ThoughtLogEntry) => {
       </div>
       <div class="worksheet-row x-tall">
         <h2 class="worksheet-label">Realistic / Rational Thoughts</h2>
-        <div class="worksheet-content">${escapeHtml(entry.rationalThought || "No rational thought entered.")}</div>
+        <div class="worksheet-content">${createRationalThoughtRows(entry)}</div>
       </div>
     </section>
   </main>
@@ -294,6 +338,14 @@ export const createReadableTextExport = (entry: ThoughtLogEntry) => {
           .map((thought, index) => `${index + 1}. ${thought.text}\n   Patterns: ${getLabelText(entry, thought.id)}`)
           .join("\n")
       : "No marked thoughts.";
+  const oneByOneResponses =
+    entry.extractedThoughts
+      .map((thought, index) => {
+        const response = getResponseText(entry, thought.id);
+        return response ? `${index + 1}. ${thought.text}\n   Response: ${response}` : "";
+      })
+      .filter(Boolean)
+      .join("\n") || "";
 
   return [
     "Mood and Thinking Log",
@@ -312,7 +364,8 @@ export const createReadableTextExport = (entry: ThoughtLogEntry) => {
     markedThoughts,
     "",
     "Realistic / Rational Thoughts",
-    entry.rationalThought || "No rational thought entered.",
+    entry.rationalThought || (oneByOneResponses ? "See one-by-one responses below." : "No rational thought entered."),
+    ...(oneByOneResponses ? ["", "One-by-one responses", oneByOneResponses] : []),
     "",
   ].join("\n");
 };

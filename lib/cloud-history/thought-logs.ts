@@ -13,8 +13,9 @@ type ThoughtLogRow = {
   extracted_thoughts: ThoughtLogEntry["extractedThoughts"];
   label_assignments: ThoughtLogEntry["labelAssignments"];
   rational_thought: string;
+  rational_responses?: ThoughtLogEntry["rationalResponses"];
   review_mode_last_used: ThoughtLogEntry["reviewModeLastUsed"];
-  schema_version: 1;
+  schema_version: 1 | 2;
 };
 
 const toRow = (entry: ThoughtLogEntry, userId: string): ThoughtLogRow => ({
@@ -29,6 +30,7 @@ const toRow = (entry: ThoughtLogEntry, userId: string): ThoughtLogRow => ({
   extracted_thoughts: entry.extractedThoughts,
   label_assignments: entry.labelAssignments,
   rational_thought: entry.rationalThought,
+  rational_responses: entry.rationalResponses,
   review_mode_last_used: entry.reviewModeLastUsed,
   schema_version: entry.schemaVersion,
 });
@@ -44,6 +46,7 @@ const fromRow = (row: ThoughtLogRow): ThoughtLogEntry => ({
   extractedThoughts: row.extracted_thoughts ?? [],
   labelAssignments: row.label_assignments ?? [],
   rationalThought: row.rational_thought,
+  rationalResponses: row.rational_responses ?? [],
   reviewModeLastUsed: row.review_mode_last_used,
   schemaVersion: row.schema_version,
 });
