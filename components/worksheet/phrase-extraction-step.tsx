@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Check, Wand2 } from "lucide-react";
 import type { ExtractedThought } from "@/lib/thought-log/types";
 import { createManualThought, segmentThoughts } from "@/lib/thought-log/segmenter";
@@ -10,22 +11,60 @@ type PhraseExtractionStepProps = {
   onChange: (thoughts: ExtractedThought[]) => void;
 };
 
+type PendingSelection = {
+  start: number;
+  end: number;
+};
+
 export function PhraseExtractionStep({ thoughtText, thoughts, onChange }: PhraseExtractionStepProps) {
-  const confirmSelection = () => {
+  const passageRef = useRef<HTMLDivElement>(null);
+  const pendingSelectionRef = useRef<PendingSelection | null>(null);
+
+  useEffect(() => {
+    pendingSelectionRef.current = null;
+  }, [thoughtText]);
+
+  const readPassageSelection = (): PendingSelection | null => {
     const selection = window.getSelection();
     const selectedText = selection?.toString().trim();
 
     if (!selection || !selectedText) {
-      return;
+      return null;
+    }
+
+    const selectedRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+    const selectionBelongsToPassage =
+      !selectedRange || !passageRef.current || passageRef.current.contains(selectedRange.commonAncestorContainer);
+
+    if (!selectionBelongsToPassage) {
+      return null;
     }
 
     const start = thoughtText.indexOf(selectedText);
     if (start < 0) {
+      return null;
+    }
+
+    return { start, end: start + selectedText.length };
+  };
+
+  const rememberSelection = () => {
+    const selection = readPassageSelection();
+    if (selection) {
+      pendingSelectionRef.current = selection;
+    }
+  };
+
+  const confirmSelection = () => {
+    const selection = readPassageSelection() ?? pendingSelectionRef.current;
+
+    if (!selection) {
       return;
     }
 
-    onChange([...thoughts, createManualThought(thoughtText, start, start + selectedText.length)]);
-    selection.removeAllRanges();
+    onChange([...thoughts, createManualThought(thoughtText, selection.start, selection.end)]);
+    pendingSelectionRef.current = null;
+    window.getSelection()?.removeAllRanges();
   };
 
   const autoChoose = () => {
@@ -48,7 +87,14 @@ export function PhraseExtractionStep({ thoughtText, thoughts, onChange }: Phrase
         </div>
         <span className="phrase-count">{thoughts.length} marked</span>
       </div>
-      <div className="passage-box" aria-label="Thought passage for selection">
+      <div
+        ref={passageRef}
+        className="passage-box"
+        aria-label="Thought passage for selection"
+        onKeyUp={rememberSelection}
+        onMouseUp={rememberSelection}
+        onTouchEnd={rememberSelection}
+      >
         {renderMarkedText(thoughtText, thoughts)}
       </div>
       <div className="action-row">
