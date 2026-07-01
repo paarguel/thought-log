@@ -19,7 +19,7 @@ export function TopBar({ onExport, onReset }: TopBarProps) {
         <Link className="icon-button" href="/history" aria-label="Open history">
           <Home size={20} aria-hidden="true" />
         </Link>
-        <button className="icon-button" type="button" onClick={onExport} aria-label="Export current worksheet">
+        <button className="icon-button" type="button" onClick={onExport} aria-label="Print current worksheet or save PDF">
           <Download size={20} aria-hidden="true" />
         </button>
         <button className="icon-button" type="button" onClick={onReset} aria-label="Start over">

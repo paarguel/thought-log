@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { ThoughtLogEntry } from "@/lib/thought-log/types";
-import { exportEntryAsHtml, exportEntryAsJson } from "@/lib/local-store/export";
+import { exportEntryAsJson, exportEntryAsText, printEntryWorksheet } from "@/lib/local-store/export";
 import { saveLocalEntry } from "@/lib/local-store/indexed-db";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { saveCloudThoughtLog } from "@/lib/cloud-history/thought-logs";
@@ -45,11 +45,11 @@ export function SaveOptions({ entry }: SaveOptionsProps) {
         >
           Save on this device
         </button>
-        <button className="secondary-button" type="button" disabled={busy} onClick={() => run(() => exportEntryAsHtml(entry), "Printable HTML exported.")}>
-          Export printable file
+        <button className="secondary-button" type="button" disabled={busy} onClick={() => run(() => printEntryWorksheet(entry), "Worksheet opened for print or PDF.")}>
+          Print worksheet / save PDF
         </button>
-        <button className="secondary-button" type="button" disabled={busy} onClick={() => run(() => exportEntryAsJson(entry), "JSON file exported.")}>
-          Export data file
+        <button className="secondary-button" type="button" disabled={busy} onClick={() => run(() => exportEntryAsText(entry), "Readable worksheet copy downloaded.")}>
+          Download readable copy
         </button>
         <button
           className="secondary-button"
@@ -67,6 +67,12 @@ export function SaveOptions({ entry }: SaveOptionsProps) {
         >
           Save to cloud history
         </button>
+        <details className="advanced-export">
+          <summary>Backup data</summary>
+          <button className="text-button" type="button" disabled={busy} onClick={() => run(() => exportEntryAsJson(entry), "Backup data downloaded.")}>
+            Download app backup (.json)
+          </button>
+        </details>
         {!isSupabaseConfigured() && <p className="muted">Cloud history appears after Supabase is configured.</p>}
         {message && <p className="notice">{message}</p>}
       </div>

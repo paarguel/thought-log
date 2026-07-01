@@ -6,12 +6,16 @@ import { ArrowLeft } from "lucide-react";
 import type { ThoughtLogEntry } from "@/lib/thought-log/types";
 import { clearLocalEntries, deleteLocalEntry, listLocalEntries } from "@/lib/local-store/indexed-db";
 import { CloudHistory } from "@/components/history/cloud-history";
+import { ThoughtLogReview } from "@/components/history/thought-log-review";
 
 export function HistoryPage() {
   const [localEntries, setLocalEntries] = useState<ThoughtLogEntry[]>([]);
+  const [selectedEntry, setSelectedEntry] = useState<ThoughtLogEntry | null>(null);
 
   const refresh = async () => {
-    setLocalEntries(sortEntries(await listLocalEntries()));
+    const entries = sortEntries(await listLocalEntries());
+    setLocalEntries(entries);
+    setSelectedEntry((current) => (current && entries.some((entry) => entry.id === current.id) ? current : null));
   };
 
   useEffect(() => {
@@ -56,6 +60,7 @@ export function HistoryPage() {
                 type="button"
                 onClick={async () => {
                   await clearLocalEntries();
+                  setSelectedEntry(null);
                   await refresh();
                 }}
               >
@@ -69,20 +74,26 @@ export function HistoryPage() {
                   <strong>{entry.title}</strong>
                   <span className="muted">{new Date(entry.createdAt).toLocaleString()}</span>
                   <p>{entry.rationalThought || entry.thoughtText || entry.situation}</p>
-                  <button
-                    className="danger-button"
-                    type="button"
-                    onClick={async () => {
-                      await deleteLocalEntry(entry.id);
-                      await refresh();
-                    }}
-                  >
-                    Delete local copy
-                  </button>
+                  <div className="action-row">
+                    <button className="secondary-button" type="button" onClick={() => setSelectedEntry(entry)}>
+                      Review
+                    </button>
+                    <button
+                      className="danger-button"
+                      type="button"
+                      onClick={async () => {
+                        await deleteLocalEntry(entry.id);
+                        await refresh();
+                      }}
+                    >
+                      Delete local copy
+                    </button>
+                  </div>
                 </article>
               ))}
             </div>
           </section>
+          {selectedEntry && <ThoughtLogReview entry={selectedEntry} onClose={() => setSelectedEntry(null)} />}
           <section className="history-section section-gap">
             <h2>Cloud history</h2>
             <CloudHistory />

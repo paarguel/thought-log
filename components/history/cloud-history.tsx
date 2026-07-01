@@ -5,9 +5,11 @@ import type { ThoughtLogEntry } from "@/lib/thought-log/types";
 import { deleteCloudThoughtLog, listCloudThoughtLogs } from "@/lib/cloud-history/thought-logs";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { SignInPanel } from "@/components/auth/sign-in-panel";
+import { ThoughtLogReview } from "@/components/history/thought-log-review";
 
 export function CloudHistory() {
   const [entries, setEntries] = useState<ThoughtLogEntry[]>([]);
+  const [selectedEntry, setSelectedEntry] = useState<ThoughtLogEntry | null>(null);
   const [message, setMessage] = useState("");
   const [loaded, setLoaded] = useState(false);
 
@@ -31,6 +33,7 @@ export function CloudHistory() {
   const refresh = async () => {
     const result = await readCloudEntries();
     setEntries(result.entries);
+    setSelectedEntry((current) => (current && result.entries.some((entry) => entry.id === current.id) ? current : null));
     setMessage(result.message);
     setLoaded(true);
   };
@@ -73,22 +76,28 @@ export function CloudHistory() {
           <strong>{entry.title}</strong>
           <span className="muted">{new Date(entry.createdAt).toLocaleString()}</span>
           <p>{entry.rationalThought || entry.thoughtText || entry.situation}</p>
-          <button
-            className="danger-button"
-            type="button"
-            onClick={async () => {
-              const client = createClient();
-              if (!client) {
-                return;
-              }
-              await deleteCloudThoughtLog(client, entry.id);
-              await refresh();
-            }}
-          >
-            Delete cloud copy
-          </button>
+          <div className="action-row">
+            <button className="secondary-button" type="button" onClick={() => setSelectedEntry(entry)}>
+              Review
+            </button>
+            <button
+              className="danger-button"
+              type="button"
+              onClick={async () => {
+                const client = createClient();
+                if (!client) {
+                  return;
+                }
+                await deleteCloudThoughtLog(client, entry.id);
+                await refresh();
+              }}
+            >
+              Delete cloud copy
+            </button>
+          </div>
         </article>
       ))}
+      {selectedEntry && <ThoughtLogReview entry={selectedEntry} onClose={() => setSelectedEntry(null)} />}
     </div>
   );
 }

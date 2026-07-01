@@ -18,6 +18,12 @@ test("mobile worksheet can reach local save options", async ({ page }) => {
   await page.getByLabel("Realistic / rational thought").fill("I do not know what others are thinking.");
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByRole("button", { name: "Save on this device" })).toBeVisible();
+  await page.getByRole("button", { name: "Save on this device" }).click();
+  await expect(page.getByText("Saved on this device.")).toBeVisible();
+  await page.getByRole("link", { name: "Open history" }).click();
+  await page.getByRole("button", { name: "Review" }).click();
+  await expect(page.getByLabel("Saved worksheet review")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Marked thoughts and labels" })).toBeVisible();
 });
 
 test("mobile worksheet can mark a manually selected passage thought", async ({ page }) => {

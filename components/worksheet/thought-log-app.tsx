@@ -12,7 +12,7 @@ import { ReviewStep } from "./review-step";
 import { RationalThoughtStep } from "./rational-thought-step";
 import { SaveOptions } from "./save-options";
 import { StepFooter } from "./step-footer";
-import { exportEntryAsHtml } from "@/lib/local-store/export";
+import { printEntryWorksheet } from "@/lib/local-store/export";
 
 const steps = ["situation", "feelings", "thoughts", "extract", "label", "review", "rational", "save"] as const;
 
@@ -33,7 +33,7 @@ export function ThoughtLogApp() {
   return (
     <main className="app-shell">
       <div className="phone-frame">
-        <TopBar onExport={() => exportEntryAsHtml(entry)} onReset={reset} />
+        <TopBar onExport={() => printEntryWorksheet(entry)} onReset={reset} />
         <div className="worksheet">
           <div className="step-area">
             {current === "situation" && <SituationStep value={draft.situation} onChange={(situation) => update({ situation })} />}
