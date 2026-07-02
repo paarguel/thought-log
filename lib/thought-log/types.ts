@@ -62,9 +62,22 @@ export const createEmptyThoughtLogDraft = (): ThoughtLogDraft => ({
   schemaVersion: 2,
 });
 
+const deriveTitle = (situation: string) => {
+  const clean = situation.trim().replace(/\s+/g, " ");
+  if (!clean) {
+    return "Untitled thought log";
+  }
+  if (clean.length <= 72) {
+    return clean;
+  }
+  const cut = clean.slice(0, 72);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${(lastSpace > 40 ? cut.slice(0, lastSpace) : cut).trimEnd()}…`;
+};
+
 export const finalizeDraft = (draft: ThoughtLogDraft): ThoughtLogEntry => {
   const now = new Date().toISOString();
-  const title = draft.situation.trim().slice(0, 72) || "Untitled thought log";
+  const title = deriveTitle(draft.situation);
 
   return {
     ...draft,

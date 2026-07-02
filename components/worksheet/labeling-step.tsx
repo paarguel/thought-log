@@ -1,18 +1,17 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { DistortionId, ExtractedThought, LabelAssignment } from "@/lib/thought-log/types";
 import { DistortionPicker } from "./distortion-picker";
 
 type LabelingStepProps = {
   thoughts: ExtractedThought[];
   assignments: LabelAssignment[];
+  index: number;
   onChange: (assignments: LabelAssignment[]) => void;
 };
 
-export function LabelingStep({ thoughts, assignments, onChange }: LabelingStepProps) {
-  const [index, setIndex] = useState(0);
+export function LabelingStep({ thoughts, assignments, index, onChange }: LabelingStepProps) {
   const active = thoughts[index];
   const selected = useMemo(
     () => assignments.find((assignment) => assignment.thoughtId === active?.id)?.distortionIds ?? [],
@@ -50,19 +49,6 @@ export function LabelingStep({ thoughts, assignments, onChange }: LabelingStepPr
       </div>
       <div className="label-card">
         <p>{active.text}</p>
-      </div>
-      <div className="action-row" aria-label="Thought navigation">
-        <button className="secondary-button" type="button" onClick={() => setIndex(Math.max(0, index - 1))} disabled={index === 0}>
-          <ChevronLeft size={16} aria-hidden="true" /> Previous
-        </button>
-        <button
-          className="secondary-button"
-          type="button"
-          onClick={() => setIndex(Math.min(thoughts.length - 1, index + 1))}
-          disabled={index === thoughts.length - 1}
-        >
-          Next <ChevronRight size={16} aria-hidden="true" />
-        </button>
       </div>
       <DistortionPicker selected={selected} onChange={update} />
     </section>

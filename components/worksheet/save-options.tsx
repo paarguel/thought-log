@@ -13,6 +13,7 @@ type SaveOptionsProps = {
 
 export function SaveOptions({ entry }: SaveOptionsProps) {
   const [message, setMessage] = useState("");
+  const [tone, setTone] = useState<"success" | "error">("success");
   const [busy, setBusy] = useState(false);
 
   const run = async (action: () => Promise<void> | void, success: string) => {
@@ -20,8 +21,10 @@ export function SaveOptions({ entry }: SaveOptionsProps) {
     setMessage("");
     try {
       await action();
+      setTone("success");
       setMessage(success);
     } catch (error) {
+      setTone("error");
       setMessage(error instanceof Error ? error.message : "Something went wrong.");
     } finally {
       setBusy(false);
@@ -74,7 +77,7 @@ export function SaveOptions({ entry }: SaveOptionsProps) {
           </button>
         </details>
         {!isSupabaseConfigured() && <p className="muted">Cloud history appears after Supabase is configured.</p>}
-        {message && <p className="notice">{message}</p>}
+        {message && <p className={tone === "success" ? "notice notice-success" : "notice notice-error"}>{message}</p>}
       </div>
     </section>
   );

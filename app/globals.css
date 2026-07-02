@@ -165,7 +165,21 @@ button:disabled {
 
 .step-area {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   padding: 18px 16px 24px;
+}
+
+.step-area > section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.step-hint {
+  margin: 0 0 4px;
+  font-size: 0.9rem;
 }
 
 .step-kicker {
@@ -198,6 +212,7 @@ button:disabled {
 }
 
 .text-area {
+  flex: 1;
   min-height: 190px;
   resize: vertical;
   padding: 14px;
@@ -244,6 +259,13 @@ button:disabled {
   background: rgba(255, 254, 250, 0.98);
 }
 
+.footer-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .progress-line {
   grid-column: 1 / -1;
   height: 6px;
@@ -278,24 +300,32 @@ button:disabled {
 
 .word-token {
   display: inline;
-  border-radius: 6px;
   cursor: pointer;
   transition: background 120ms ease, box-shadow 120ms ease;
 }
 
-.word-token-selected {
+.word-token-selected,
+.gap-selected {
   background: var(--sky);
-  box-shadow: 0 0 0 2px var(--sky);
 }
 
-.word-token-marked {
+.word-token-marked,
+.gap-marked {
   background: var(--gold);
-  box-shadow: 0 0 0 2px var(--gold);
 }
 
 .word-token-selected.word-token-marked {
   background: #d9eef5;
-  box-shadow: 0 0 0 2px var(--focus);
+  box-shadow: inset 0 -2px 0 var(--focus);
+}
+
+/* Round only the outer edges of a run so a marked phrase reads as one continuous highlight. */
+.word-token-marked:not(.word-token-selected) {
+  border-radius: 0;
+}
+
+.gap-selected {
+  border-radius: 0;
 }
 
 .marked {
@@ -332,6 +362,16 @@ button:disabled {
   margin-top: 14px;
   padding: 12px;
   border-radius: 8px;
+  background: var(--rose);
+  color: #5d302b;
+}
+
+.notice-success {
+  background: #dce9e0;
+  color: #234b3a;
+}
+
+.notice-error {
   background: var(--rose);
   color: #5d302b;
 }
@@ -401,6 +441,14 @@ button:disabled {
   background: #fff;
   border-radius: 8px;
   padding: 12px;
+}
+
+.history-item strong {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .save-options {
@@ -488,7 +536,10 @@ button:disabled {
 }
 
 .response-stack {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   gap: 12px;
 }
 

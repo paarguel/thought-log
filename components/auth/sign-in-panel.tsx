@@ -6,10 +6,12 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 export function SignInPanel() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [tone, setTone] = useState<"success" | "error">("success");
 
   const signIn = async () => {
     const client = createClient();
     if (!client) {
+      setTone("error");
       setMessage("Cloud history is not configured yet.");
       return;
     }
@@ -21,6 +23,7 @@ export function SignInPanel() {
       },
     });
 
+    setTone(error ? "error" : "success");
     setMessage(error ? error.message : "Check your email for the sign-in link.");
   };
 
@@ -37,7 +40,7 @@ export function SignInPanel() {
       <button className="primary-button button-gap" type="button" onClick={signIn} disabled={!email}>
         Send sign-in link
       </button>
-      {message && <p className="notice">{message}</p>}
+      {message && <p className={tone === "success" ? "notice notice-success" : "notice notice-error"}>{message}</p>}
     </div>
   );
 }

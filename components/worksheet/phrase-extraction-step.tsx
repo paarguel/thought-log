@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Check, Wand2 } from "lucide-react";
 import type { ExtractedThought } from "@/lib/thought-log/types";
 import { createManualThought, segmentThoughts } from "@/lib/thought-log/segmenter";
@@ -15,7 +15,6 @@ type WordToken = {
   index: number;
   start: number;
   end: number;
-  text: string;
 };
 
 type TokenSelection = {
@@ -24,55 +23,12 @@ type TokenSelection = {
 };
 
 export function PhraseExtractionStep({ thoughtText, thoughts, onChange }: PhraseExtractionStepProps) {
-  const passageRef = useRef<HTMLDivElement>(null);
-  const [isSelecting, setIsSelecting] = useState(false);
   const [tokenSelection, setTokenSelection] = useState<TokenSelection | null>(null);
   const tokens = useMemo(() => createWordTokens(thoughtText), [thoughtText]);
   const selectedBounds = tokenSelection ? getSelectionBounds(tokenSelection, tokens) : null;
 
-  const updateFocusFromPoint = (clientX: number, clientY: number) => {
-    const target = document.elementFromPoint(clientX, clientY);
-    const tokenElement = target instanceof HTMLElement ? target.closest<HTMLElement>("[data-token-index]") : null;
-
-    if (!tokenElement || !passageRef.current?.contains(tokenElement)) {
-      return;
-    }
-
-    const tokenIndex = Number(tokenElement.dataset.tokenIndex);
-    if (Number.isNaN(tokenIndex)) {
-      return;
-    }
-
-    setTokenSelection((current) => (current ? { ...current, focus: tokenIndex } : current));
-  };
-
-  const startTokenSelection = (tokenIndex: number, event: PointerEvent<HTMLSpanElement>) => {
-    event.preventDefault();
-    event.currentTarget.parentElement?.setPointerCapture?.(event.pointerId);
-    window.getSelection()?.removeAllRanges();
-    setIsSelecting(true);
-    setTokenSelection({ anchor: tokenIndex, focus: tokenIndex });
-  };
-
-  const updateTokenSelection = (event: PointerEvent<HTMLDivElement>) => {
-    if (!isSelecting) {
-      return;
-    }
-
-    updateFocusFromPoint(event.clientX, event.clientY);
-  };
-
-  const finishTokenSelection = (event: PointerEvent<HTMLDivElement>) => {
-    if (!isSelecting) {
-      return;
-    }
-
-    updateFocusFromPoint(event.clientX, event.clientY);
-    setIsSelecting(false);
-
-    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
+  const tapToken = (tokenIndex: number) => {
+    setTokenSelection((current) => (current ? { anchor: current.anchor, focus: tokenIndex } : { anchor: tokenIndex, focus: tokenIndex }));
   };
 
   const confirmSelection = () => {
@@ -100,7 +56,6 @@ export function PhraseExtractionStep({ thoughtText, thoughts, onChange }: Phrase
 
   const clearSelection = () => {
     setTokenSelection(null);
-    window.getSelection()?.removeAllRanges();
   };
 
   return (
@@ -112,15 +67,9 @@ export function PhraseExtractionStep({ thoughtText, thoughts, onChange }: Phrase
         </div>
         <span className="phrase-count">{thoughts.length} marked</span>
       </div>
-      <div
-        ref={passageRef}
-        className="passage-box selectable-passage"
-        aria-label="Thought passage for selection"
-        onPointerMove={updateTokenSelection}
-        onPointerUp={finishTokenSelection}
-        onPointerCancel={finishTokenSelection}
-      >
-        {renderSelectableText(thoughtText, tokens, thoughts, tokenSelection, startTokenSelection)}
+      <p className="muted step-hint">Tap the first and last word of a thought, then Mark selection. Or let Auto choose split it for you.</p>
+      <div className="passage-box selectable-passage" aria-label="Thought passage for selection">
+        {renderSelectableText(thoughtText, tokens, thoughts, tokenSelection, tapToken)}
       </div>
       <div className="action-row">
         <button type="button" className={`primary-button${selectedBounds ? " cta-glow" : ""}`} onClick={confirmSelection} disabled={!selectedBounds}>
@@ -129,7 +78,7 @@ export function PhraseExtractionStep({ thoughtText, thoughts, onChange }: Phrase
         <button type="button" className="secondary-button" onClick={autoChoose}>
           <Wand2 size={16} aria-hidden="true" /> Auto choose thoughts
         </button>
-        <button type="button" className="text-button" onClick={clearSelection}>
+        <button type="button" className="text-button" onClick={clearSelection} disabled={!tokenSelection}>
           Clear selection
         </button>
         <button type="button" className="text-button" onClick={undoLast} disabled={thoughts.length === 0}>
@@ -150,7 +99,6 @@ const createWordTokens = (text: string): WordToken[] => {
       index: tokens.length,
       start: match.index,
       end: match.index + match[0].length,
-      text: match[0],
     });
   }
 
@@ -173,35 +121,66 @@ const getSelectionBounds = (selection: TokenSelection, tokens: WordToken[]) => {
 const tokenOverlapsThought = (token: WordToken, thoughts: ExtractedThought[]) =>
   thoughts.some((thought) => token.start < thought.end && token.end > thought.start);
 
+type TokenState = {
+  selected: boolean;
+  marked: boolean;
+};
+
 const renderSelectableText = (
   text: string,
   tokens: WordToken[],
   thoughts: ExtractedThought[],
   selection: TokenSelection | null,
-  onPointerDown: (tokenIndex: number, event: PointerEvent<HTMLSpanElement>) => void,
+  onTap: (tokenIndex: number) => void,
 ) => {
   if (tokens.length === 0) {
     return text;
   }
 
   const selectedBounds = selection ? getSelectionBounds(selection, tokens) : null;
+  const stateOf = (token: WordToken): TokenState => ({
+    selected: selectedBounds ? token.index >= selectedBounds.firstIndex && token.index <= selectedBounds.lastIndex : false,
+    marked: tokenOverlapsThought(token, thoughts),
+  });
+
   const parts: ReactNode[] = [];
   let cursor = 0;
 
-  tokens.forEach((token) => {
-    if (token.start > cursor) {
-      parts.push(text.slice(cursor, token.start));
-    }
+  tokens.forEach((token, position) => {
+    const state = stateOf(token);
 
-    const selected = selectedBounds ? token.index >= selectedBounds.firstIndex && token.index <= selectedBounds.lastIndex : false;
-    const marked = tokenOverlapsThought(token, thoughts);
+    if (token.start > cursor) {
+      // Highlight the gap between two same-state tokens so runs read as one continuous phrase.
+      const previous = position > 0 ? stateOf(tokens[position - 1]) : null;
+      const gapSelected = state.selected && previous?.selected;
+      const gapMarked = state.marked && previous?.marked;
+      const gapClass = gapSelected ? "gap-selected" : gapMarked ? "gap-marked" : "";
+      const gapText = text.slice(cursor, token.start);
+      parts.push(
+        gapClass ? (
+          <span className={gapClass} key={`gap-${token.start}`}>
+            {gapText}
+          </span>
+        ) : (
+          gapText
+        ),
+      );
+    }
 
     parts.push(
       <span
-        className={`word-token${selected ? " word-token-selected" : ""}${marked ? " word-token-marked" : ""}`}
+        className={`word-token${state.selected ? " word-token-selected" : ""}${state.marked ? " word-token-marked" : ""}`}
         data-token-index={token.index}
         key={`${token.start}-${token.end}`}
-        onPointerDown={(event) => onPointerDown(token.index, event)}
+        role="button"
+        tabIndex={0}
+        onClick={() => onTap(token.index)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onTap(token.index);
+          }
+        }}
       >
         {text.slice(token.start, token.end)}
       </span>,

@@ -1,43 +1,43 @@
 import type { ExtractedThought } from "./types";
 
-const thoughtCuePattern = /\b(always|never|everyone|nobody|can't|cannot|won't|should|must|ruined|awful|weird|defective|failure)\b/i;
+const MAX_SEGMENTS = 12;
+const MIN_SEGMENT_LENGTH = 3;
 
+// Split into sentence-like chunks on terminators, semicolons, and line breaks
+// while keeping the offsets pointing at the ORIGINAL text so highlights line up.
 export const segmentThoughts = (text: string): ExtractedThought[] => {
-  const normalized = text.replace(/\s+/g, " ").trim();
-
-  if (!normalized) {
+  if (!text.trim()) {
     return [];
   }
 
-  const rawSegments = normalized
-    .split(/(?<=[.!?])\s+|;\s+|\s+-\s+|\s+\bbut\b\s+/i)
-    .map((segment) => segment.trim())
-    .filter(Boolean);
+  const segments: { start: number; end: number; text: string }[] = [];
+  const pattern = /[^.!?;\n]+[.!?;]*/g;
+  let match: RegExpExecArray | null;
 
-  const candidates = rawSegments.length > 1 ? rawSegments : normalized.split(/,\s+(?=\b(?:I|everyone|they|unless|if|when)\b)/i);
+  while ((match = pattern.exec(text)) !== null) {
+    const raw = match[0];
+    const leading = raw.length - raw.trimStart().length;
+    const trimmed = raw.trim();
 
-  const selected = candidates
-    .map((segment) => segment.trim())
-    .filter((segment) => segment.length >= 8)
-    .filter((segment) => thoughtCuePattern.test(segment) || segment.split(" ").length >= 5)
-    .slice(0, 8);
+    if (trimmed.length < MIN_SEGMENT_LENGTH) {
+      continue;
+    }
 
-  let cursor = 0;
+    const start = match.index + leading;
+    segments.push({ start, end: start + trimmed.length, text: trimmed });
 
-  return selected.map((segment, index) => {
-    const start = normalized.indexOf(segment, cursor);
-    const safeStart = start >= 0 ? start : cursor;
-    const end = safeStart + segment.length;
-    cursor = end;
+    if (segments.length >= MAX_SEGMENTS) {
+      break;
+    }
+  }
 
-    return {
-      id: `auto-${index + 1}`,
-      text: segment,
-      start: safeStart,
-      end,
-      source: "auto" as const,
-    };
-  });
+  return segments.map((segment, index) => ({
+    id: `auto-${index + 1}`,
+    text: segment.text,
+    start: segment.start,
+    end: segment.end,
+    source: "auto" as const,
+  }));
 };
 
 export const createManualThought = (text: string, start: number, end: number): ExtractedThought => ({
