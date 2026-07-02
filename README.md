@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Thought Log
 
-## Getting Started
+A private, mobile-first thought log. Write out what's in your head, circle the
+thoughts — like on a paper CBT worksheet — name the thinking patterns, and land
+on a more balanced thought.
 
-First, run the development server:
+No AI reads your entries. No analytics. Nothing leaves your device unless you
+explicitly choose cloud save.
+
+## How your data is stored
+
+| Choice | Where it lives | Who can see it |
+| --- | --- | --- |
+| **Save on this device** | This browser's IndexedDB | Only this device |
+| **Export (printable / JSON)** | A file you download | Whoever you give the file to |
+| **Save to cloud history** | Supabase Postgres, row-locked to your account | Only you, signed in |
+| **Discard** | Nowhere | Nobody |
+
+Drafts autosave to the device while you work so nothing is lost; they are never
+uploaded. Signing in is optional (Obsidian-style) — it only unlocks cloud
+history, it is never required to use the worksheet.
+
+See [docs/operations/privacy.md](docs/operations/privacy.md) for the full posture.
+
+## Develop
 
 ```bash
+npm install
+cp .env.example .env.local   # optional: add Supabase keys for cloud sync
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Without Supabase env vars the app runs in local-only mode — the full worksheet,
+device saves, and export all work.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Verify
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run test
+npm run build
+```
 
-## Learn More
+## Deploy
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The app deploys to Vercel; cloud history uses a Supabase project whose schema
+lives in [supabase/migrations](supabase/migrations). Security model: explicit
+grants to `authenticated` only (no `anon` access) plus RLS policies scoped to
+`auth.uid() = user_id`. See [docs/operations/deployment.md](docs/operations/deployment.md).
