@@ -72,6 +72,7 @@ export function CircleStep({
   const handleLoRef = useRef<HTMLDivElement>(null);
   const handleHiRef = useRef<HTMLDivElement>(null);
   const dragging = useRef<null | "lo" | "hi">(null);
+  const dragEndedAt = useRef(-Infinity);
   const lastTap = useRef<{ idx: number; time: number } | null>(null);
 
   const tokens = useMemo(() => tokenize(w.thoughtText), [w.thoughtText]);
@@ -120,6 +121,10 @@ export function CircleStep({
   };
 
   const onWordTap = (i: number, timeStamp: number) => {
+    // Releasing a drag handle makes the browser synthesize a click on the
+    // word under the finger (a line below the sampled word) — swallowing it
+    // keeps the selection where the drag left it.
+    if (timeStamp - dragEndedAt.current < 500) return;
     const token = tokens[i];
     const marked = phraseAt(token.start, token.end);
     if (marked) {
@@ -169,7 +174,8 @@ export function CircleStep({
     });
   };
 
-  const onHandleUp = () => {
+  const onHandleUp = (e: React.PointerEvent) => {
+    if (dragging.current) dragEndedAt.current = e.timeStamp;
     dragging.current = null;
   };
 

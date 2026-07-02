@@ -31,6 +31,15 @@ export function LabelStep({
     return null;
   }
 
+  const removeCurrent = () => {
+    dispatch({ type: "removePhrase", id: phrase.id });
+    setOpenInfo(null);
+    if (phrases.length === 1) {
+      // That was the only thought — nothing left to label or review.
+      dispatch({ type: "next" });
+    }
+  };
+
   return (
     <section className="step-enter flex flex-1 flex-col" aria-label="Name the pattern">
       <StepHeader
@@ -42,9 +51,14 @@ export function LabelStep({
       <p className="mb-1 text-[0.8125rem] text-ink-faint">
         Thought {clamped + 1} of {phrases.length}
       </p>
-      <blockquote className="mb-5 rounded-xl bg-mark-soft px-4 py-3 font-display text-[1.1875rem] leading-snug text-ink">
+      <blockquote className="rounded-xl bg-mark-soft px-4 py-3 font-display text-[1.1875rem] leading-snug text-ink">
         “{phrase.text}”
       </blockquote>
+      <div className="mb-3 -ml-2 flex justify-start">
+        <GhostButton onClick={removeCurrent} className="!text-danger !px-2 !min-h-9 text-[0.875rem]">
+          Remove this thought
+        </GhostButton>
+      </div>
 
       <ul className="flex flex-col gap-1.5" aria-label="Thinking patterns">
         {DISTORTIONS.map((d) => {

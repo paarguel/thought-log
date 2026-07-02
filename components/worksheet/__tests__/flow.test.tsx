@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { WorksheetFlow } from "../worksheet-flow";
 import { MarkedPassage } from "../review-step";
 import { newWorksheet } from "@/lib/thought-log/types";
+import { clearDraft } from "@/lib/local-store/indexed-db";
 
 describe("WorksheetFlow", () => {
   it("opens on the Situation step with one primary action", async () => {
@@ -30,6 +31,35 @@ describe("WorksheetFlow", () => {
     await user.click(screen.getByRole("button", { name: "Continue" }));
 
     expect(await screen.findByText("Circle the thoughts.")).toBeInTheDocument();
+  });
+
+  it("lets the user drop thoughts one by one while labeling", async () => {
+    await clearDraft();
+    localStorage.clear();
+    const user = userEvent.setup();
+    render(<WorksheetFlow />);
+
+    const situation = await screen.findByLabelText("Describe the situation");
+    await user.type(situation, "Boss emailed about a talk tomorrow");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(await screen.findByRole("button", { name: "Anxious" }));
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    const passage = await screen.findByLabelText("Write your thoughts freely");
+    await user.type(passage, "I am going to get fired. Everyone will know.");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    await user.click(
+      await screen.findByRole("button", { name: "Auto-pick thoughts" })
+    );
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+
+    expect(await screen.findByText("Thought 1 of 2")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Remove this thought" }));
+    expect(await screen.findByText("Thought 1 of 1")).toBeInTheDocument();
+
+    // Removing the last thought skips labeling and review entirely.
+    await user.click(screen.getByRole("button", { name: "Remove this thought" }));
+    expect(await screen.findByText("A more balanced thought.")).toBeInTheDocument();
   });
 });
 
