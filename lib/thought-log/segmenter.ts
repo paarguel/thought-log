@@ -51,6 +51,16 @@ function splitOnBoundaries(
 }
 
 /**
+ * The segment (sentence-ish unit) containing a character offset, if any.
+ * Used by double-tap-to-select-sentence in the circle step.
+ */
+export function segmentAt(text: string, offset: number): Segment | null {
+  return (
+    segmentPassage(text).find((s) => offset >= s.start && offset < s.end) ?? null
+  );
+}
+
+/**
  * Segment a passage into candidate thought phrases.
  * Sentences first; long sentences are further split on ", but/and/so/because".
  */

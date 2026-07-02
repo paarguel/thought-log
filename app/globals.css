@@ -121,10 +121,53 @@ body > * {
 }
 
 .phrase-pending {
-  background: var(--accent-soft);
+  background: var(--mark-soft);
+  box-shadow: 0 2px 0 var(--accent);
   border-radius: 3px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
+}
+
+/* Bigger invisible tap targets for words without changing layout */
+.tap-word {
+  padding: 0.3em 0.09em;
+  margin: -0.26em -0.05em;
+  border-radius: 4px;
+}
+
+/* Native-selection-style drag handles: 18px teardrop in a 44px hit area */
+.sel-handle-wrap {
+  position: absolute;
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  margin-left: -22px;
+  margin-top: -4px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  touch-action: none;
+  cursor: grab;
+}
+
+.sel-handle-wrap:active {
+  cursor: grabbing;
+}
+
+.sel-handle {
+  width: 18px;
+  height: 18px;
+  background: var(--accent);
+  border: 2px solid var(--paper-raised);
+  box-shadow: 0 1px 4px rgba(60, 50, 30, 0.35);
+}
+
+.sel-handle-lo {
+  border-radius: 50% 4px 50% 50%;
+}
+
+.sel-handle-hi {
+  border-radius: 4px 50% 50% 50%;
 }
 
 /* Gentle step entrance */

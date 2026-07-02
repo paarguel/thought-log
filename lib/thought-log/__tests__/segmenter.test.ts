@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { segmentPassage } from "../segmenter";
+import { segmentAt, segmentPassage } from "../segmenter";
 
 describe("segmentPassage", () => {
   it("returns nothing for empty input", () => {
@@ -42,6 +42,18 @@ describe("segmentPassage", () => {
     expect(segments.map((s) => s.text)).toEqual([
       "I will definitely lose my job over this.",
     ]);
+  });
+
+  it("segmentAt returns the sentence containing an offset", () => {
+    const text = "I ruined everything today. They must hate me now.";
+    const seg = segmentAt(text, text.indexOf("must"));
+    expect(seg?.text).toBe("They must hate me now.");
+    expect(segmentAt(text, 3)?.text).toBe("I ruined everything today.");
+  });
+
+  it("segmentAt returns null outside any segment", () => {
+    expect(segmentAt("", 0)).toBeNull();
+    expect(segmentAt("Too short.", 2)).toBeNull(); // dropped as fragment
   });
 
   it("is deterministic", () => {
