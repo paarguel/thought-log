@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Worksheet } from "@/lib/thought-log/types";
 import { worksheetTitle } from "@/lib/thought-log/types";
+import { feelingFamilies } from "@/lib/thought-log/feelings";
 import { listLocalEntries } from "@/lib/local-store/indexed-db";
 import { cloudConfigured } from "@/lib/supabase/client";
 import { getCurrentUser, listCloudEntries } from "@/lib/cloud/thought-logs";
@@ -16,14 +17,59 @@ import { TopBar } from "@/components/app/top-bar";
 
 function formatDate(iso: string): string {
   try {
-    return new Date(iso).toLocaleDateString(undefined, {
+    const date = new Date(iso);
+    const sameYear = date.getFullYear() === new Date().getFullYear();
+    return date.toLocaleDateString(undefined, {
       month: "short",
       day: "numeric",
-      year: "numeric",
+      ...(sameYear ? {} : { year: "numeric" }),
     });
   } catch {
     return iso;
   }
+}
+
+const MAX_CHIPS = 3;
+
+function EntryCard({ w, source }: { w: Worksheet; source: "local" | "cloud" }) {
+  const families = feelingFamilies(w.feelings);
+  const extra = families.length - MAX_CHIPS;
+  const thoughts = w.phrases.length;
+  return (
+    <Link
+      href={`/history/${w.id}?src=${source}`}
+      className="block rounded-xl border border-line bg-paper-raised px-4 py-3.5 active:bg-paper-sunken"
+    >
+      <span className="flex items-baseline justify-between gap-3">
+        <span className="truncate text-[1rem] text-ink">{worksheetTitle(w)}</span>
+        <span className="shrink-0 text-[0.8125rem] text-ink-faint">
+          {formatDate(w.createdAt)}
+        </span>
+      </span>
+      {(families.length > 0 || thoughts > 0) && (
+        <span className="mt-2 flex items-center justify-between gap-3">
+          <span className="flex min-w-0 items-center gap-1.5 overflow-hidden">
+            {families.slice(0, MAX_CHIPS).map((family) => (
+              <span
+                key={family}
+                className="shrink-0 rounded-full bg-paper-sunken px-2.5 py-0.5 text-[0.75rem] text-ink-soft"
+              >
+                {family}
+              </span>
+            ))}
+            {extra > 0 && (
+              <span className="shrink-0 text-[0.75rem] text-ink-faint">+{extra}</span>
+            )}
+          </span>
+          {thoughts > 0 && (
+            <span className="shrink-0 text-[0.8125rem] text-ink-faint">
+              {thoughts} {thoughts === 1 ? "thought" : "thoughts"}
+            </span>
+          )}
+        </span>
+      )}
+    </Link>
+  );
 }
 
 function EntryList({ entries, source }: { entries: Worksheet[]; source: "local" | "cloud" }) {
@@ -31,18 +77,7 @@ function EntryList({ entries, source }: { entries: Worksheet[]; source: "local" 
     <ul className="flex flex-col gap-2">
       {entries.map((w) => (
         <li key={w.id}>
-          <Link
-            href={`/history/${w.id}?src=${source}`}
-            className="block rounded-xl border border-line bg-paper-raised px-4 py-3 active:bg-paper-sunken"
-          >
-            <span className="block truncate text-[1rem] text-ink">{worksheetTitle(w)}</span>
-            <span className="mt-0.5 flex items-center gap-2 text-[0.8125rem] text-ink-faint">
-              {formatDate(w.createdAt)}
-              {w.feelings.length > 0 && (
-                <span className="truncate">· {w.feelings.map((f) => f.name).join(", ")}</span>
-              )}
-            </span>
-          </Link>
+          <EntryCard w={w} source={source} />
         </li>
       ))}
     </ul>
