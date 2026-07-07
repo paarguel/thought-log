@@ -7,9 +7,19 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "cap:sync": "npx cap sync ios",
+    "cap:open": "npx cap open ios",
+    "ios:doctor": "bash scripts/ios-doctor.sh",
+    "ios:release": "bash scripts/ios-release.sh",
+    "ios:archive": "bash scripts/ios-archive.sh",
+    "ios:upload": "bash scripts/ios-upload.sh",
+    "ios:testflight": "bash scripts/ios-testflight.sh"
   },
   "dependencies": {
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1",
+    "@capacitor/ios": "^8.4.1",
     "idb": "^8.0.3",
     "next": "16.2.10",
     "react": "19.2.4",
