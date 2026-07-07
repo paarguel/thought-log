@@ -57,6 +57,6 @@ describe("exportFilename", () => {
   it("builds a safe slug", () => {
     const w = sampleWorksheet();
     const name = exportFilename(w, "html");
-    expect(name).toMatch(/^thought-log-2026-07-02-[a-z0-9-]+\.html$/);
+    expect(name).toMatch(/^thinking-errors-2026-07-02-[a-z0-9-]+\.html$/);
   });
 });

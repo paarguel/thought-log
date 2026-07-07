@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 /**
- * Compact top bar: wordmark on the left, history + account on the right.
+ * Compact top bar: wordmark on the left, history + data pages on the right.
  * Kept quiet so the worksheet stays the subject of the screen (R1).
  */
 export function TopBar() {
@@ -11,10 +11,10 @@ export function TopBar() {
     <header className="flex items-center justify-between px-5 pt-4 pb-2">
       <Link
         href="/"
-        className="font-display italic text-[1.125rem] text-ink tracking-tight"
-        aria-label="Thought Log — start"
+        className="font-display italic text-[1.0625rem] text-ink tracking-tight"
+        aria-label="Thinking Errors NotePad — start"
       >
-        Thought Log
+        Thinking Errors NotePad
       </Link>
       <nav className="flex items-center gap-1" aria-label="App">
         <Link
@@ -34,14 +34,20 @@ export function TopBar() {
           </svg>
         </Link>
         <Link
-          href="/account"
-          aria-label="Account and sync"
+          href="/data"
+          aria-label="Your data"
           className="flex h-11 w-11 items-center justify-center rounded-full text-ink-soft active:bg-paper-sunken"
         >
           <svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="12" cy="8.2" r="3.4" stroke="currentColor" strokeWidth="1.7" />
+            <ellipse cx="12" cy="6.5" rx="7" ry="3" stroke="currentColor" strokeWidth="1.7" />
             <path
-              d="M5 19.5c.8-3.1 3.6-4.8 7-4.8s6.2 1.7 7 4.8"
+              d="M5 6.5v11c0 1.66 3.13 3 7 3s7-1.34 7-3v-11"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+            />
+            <path
+              d="M5 12c0 1.66 3.13 3 7 3s7-1.34 7-3"
               stroke="currentColor"
               strokeWidth="1.7"
               strokeLinecap="round"

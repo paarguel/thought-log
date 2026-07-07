@@ -2,13 +2,12 @@
 
 /**
  * End of the worksheet: the user decides where this entry lives (R11).
- * Save on device, export a file, save to cloud (if signed in), or discard.
- * Local paths never touch the network (R12).
+ * Save on device, export a file, or discard. Everything stays on the
+ * device — this app has no server and no accounts (R12).
  */
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import type { User } from "@supabase/supabase-js";
 import type { FlowAction, FlowState } from "@/lib/thought-log/reducer";
 import { saveLocalEntry, clearDraft } from "@/lib/local-store/indexed-db";
 import {
@@ -17,8 +16,6 @@ import {
   worksheetToJson,
   worksheetToPrintableHtml,
 } from "@/lib/local-store/export";
-import { cloudConfigured } from "@/lib/supabase/client";
-import { getCurrentUser, saveToCloud } from "@/lib/cloud/thought-logs";
 import { GhostButton } from "@/components/ui/buttons";
 import { StepHeader } from "./step-chrome";
 
@@ -62,11 +59,6 @@ export function SaveStep({
   const w = state.worksheet;
   const [status, setStatus] = useState<DoneState>({ kind: "idle" });
   const [confirmDiscard, setConfirmDiscard] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    getCurrentUser().then(setUser).catch(() => setUser(null));
-  }, []);
 
   const finish = async (message: string) => {
     await clearDraft();
@@ -80,19 +72,6 @@ export function SaveStep({
       await finish("Saved on this device. Find it any time in History.");
     } catch {
       setStatus({ kind: "error", message: "Couldn't save on this device." });
-    }
-  };
-
-  const saveCloud = async () => {
-    setStatus({ kind: "saving" });
-    try {
-      await saveToCloud(w);
-      await finish("Saved to your private cloud history.");
-    } catch (e) {
-      setStatus({
-        kind: "error",
-        message: e instanceof Error ? e.message : "Cloud save failed.",
-      });
     }
   };
 
@@ -146,7 +125,7 @@ export function SaveStep({
       <div className="flex flex-col gap-2.5">
         <OptionButton
           title="Save on this device"
-          detail="Stays in this browser only. Never uploaded."
+          detail="Stays on this device only. Never uploaded — and gone if the app is removed."
           onClick={saveDevice}
           disabled={status.kind === "saving"}
         />
@@ -157,30 +136,9 @@ export function SaveStep({
         />
         <OptionButton
           title="Export data file (JSON)"
-          detail="Your raw entry, portable and yours."
+          detail="Your raw entry, portable and yours. The safest way to keep it."
           onClick={exportJson}
         />
-        {cloudConfigured() &&
-          (user ? (
-            <OptionButton
-              title="Save to cloud history"
-              detail={`Private to ${user.email ?? "your account"}. Available on your other devices.`}
-              onClick={saveCloud}
-              disabled={status.kind === "saving"}
-            />
-          ) : (
-            <Link
-              href="/account"
-              className="w-full rounded-xl border border-dashed border-line-strong px-4 py-3.5 text-left"
-            >
-              <span className="block text-[1rem] font-medium text-ink-soft">
-                Save to cloud history
-              </span>
-              <span className="mt-0.5 block text-[0.875rem] text-ink-faint">
-                Optional — sign in first. Your draft stays safe on this device meanwhile.
-              </span>
-            </Link>
-          ))}
       </div>
 
       {status.kind === "error" && (

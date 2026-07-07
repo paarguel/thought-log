@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter } from "next/font/google";
+import { DataNotice } from "@/components/app/data-notice";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -14,10 +15,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Thought Log",
+  title: "Thinking Errors NotePad",
   description:
-    "A private thought log. Write it out, circle the thoughts, name the thinking patterns.",
-  applicationName: "Thought Log",
+    "A private notepad for thinking errors. Write it out, circle the thoughts, name the patterns. Everything stays on your device.",
+  applicationName: "Thinking Errors NotePad",
 };
 
 export const viewport: Viewport = {
@@ -36,7 +37,10 @@ export default function RootLayout({
       lang="en"
       className={`${fraunces.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <DataNotice />
+      </body>
     </html>
   );
 }
