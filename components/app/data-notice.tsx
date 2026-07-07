@@ -6,7 +6,7 @@
  * agrees to that trade before writing anything.
  */
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 const ACK_KEY = "ten:data-notice-ack";
 
@@ -24,11 +24,33 @@ function readAcknowledged(): boolean {
   }
 }
 
+/**
+ * For other components that shouldn't grab focus (and pop the keyboard)
+ * underneath the first-launch notice. False on the server; the server
+ * never focuses anything anyway.
+ */
+export function dataNoticeAcknowledged(): boolean {
+  if (typeof window === "undefined") return false;
+  return readAcknowledged();
+}
+
 export function DataNotice() {
   // Server snapshot says "acknowledged" so the prerendered HTML has no dialog;
   // the real answer replaces it on hydration.
   const acknowledged = useSyncExternalStore(subscribe, readAcknowledged, () => true);
   const [dismissed, setDismissed] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const open = !acknowledged && !dismissed;
+
+  // The worksheet's autofocused textarea must yield to the modal. iOS ignores
+  // programmatic focus() without a user gesture, but blur() always works and
+  // dismisses the keyboard; the focus() is for desktop/a11y.
+  useEffect(() => {
+    if (!open) return;
+    const active = document.activeElement;
+    if (active instanceof HTMLElement) active.blur();
+    buttonRef.current?.focus();
+  }, [open]);
 
   const acknowledge = () => {
     try {
@@ -39,14 +61,14 @@ export function DataNotice() {
     setDismissed(true);
   };
 
-  if (acknowledged || dismissed) return null;
+  if (!open) return null;
 
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="data-notice-title"
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4"
     >
       <div className="w-full max-w-md rounded-2xl bg-paper p-6 shadow-xl">
         <h2 id="data-notice-title" className="font-display text-[1.25rem] text-ink">
@@ -68,6 +90,7 @@ export function DataNotice() {
           </p>
         </div>
         <button
+          ref={buttonRef}
           type="button"
           onClick={acknowledge}
           className="mt-5 min-h-13 w-full rounded-full bg-ink text-[1.0625rem] font-medium text-paper"

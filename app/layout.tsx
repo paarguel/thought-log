@@ -25,6 +25,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#faf6ef",
+  // Draw edge-to-edge in the native shell; safe-area padding is in globals.css.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

@@ -40,6 +40,15 @@ ten_ios_require_xcode() {
 }
 
 ten_ios_load_asc_config() {
+  # TEN_IOS_AUTH=xcode: skip API-key auth and rely on an Apple ID signed into
+  # Xcode (Settings → Accounts). Needed when the API key can't touch
+  # provisioning (role below App Manager).
+  if [ "${TEN_IOS_AUTH:-key}" = "xcode" ]; then
+    echo "⚠  Using Xcode's signed-in Apple ID session (TEN_IOS_AUTH=xcode)."
+    TEN_IOS_ASC_AUTH_ARGS=()
+    return
+  fi
+
   if [ -f "$TEN_IOS_CONFIG_FILE" ]; then
     # shellcheck disable=SC1090
     source "$TEN_IOS_CONFIG_FILE"

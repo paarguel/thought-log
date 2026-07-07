@@ -5,18 +5,33 @@ web UI. Listing copy lives in [listing.md](listing.md).
 
 ## One-time setup (first release only)
 
+- [ ] **Fix the API key permissions** (verified blocker, July 2026): the
+      existing ASC API key (9WQYS5M8NZ, reused from AttuneTogether) can upload
+      builds but CANNOT touch Certificates, Identifiers & Profiles — both
+      `xcodebuild -allowProvisioningUpdates` and `POST /v1/bundleIds` fail with
+      "Unable to find a team with the given Team ID 'CLKKD53664'". That's
+      Apple's (misleading) insufficient-role error. Fix one of:
+      - **Preferred:** App Store Connect → Users and Access → Integrations →
+        create a new API key with **App Manager** (or Admin) role. Update
+        `~/.thinking-errors-notepad/ios-release.env` and drop the new `.p8`
+        into `~/.appstoreconnect/private_keys/`. Everything below then runs
+        scripted, including automatic bundle-ID registration.
+      - Or: sign into Xcode (Settings → Accounts) with the Apple ID that owns
+        team CLKKD53664, register the bundle ID at developer.apple.com →
+        Identifiers, then archive with `TEN_IOS_AUTH=xcode npm run ios:archive`.
+- [ ] **Register the bundle ID** `com.urbanpyx.thinkingerrors` (automatic with
+      an App Manager key on first archive; manual at developer.apple.com
+      otherwise)
 - [ ] **Create the app record** in [App Store Connect](https://appstoreconnect.apple.com)
       → My Apps → **+** → New App:
       - Platform: iOS
       - Name: **Thinking Errors NotePad**
       - Primary language: English (U.S.)
-      - Bundle ID: **com.urbanpyx.thinkingerrors** (register it if the picker
-        doesn't offer it — the archive step with `-allowProvisioningUpdates`
-        usually registers it automatically on first archive)
+      - Bundle ID: **com.urbanpyx.thinkingerrors**
       - SKU: `thinking-errors-notepad`
-      (This cannot be done via the API — web UI only.)
+      (App records cannot be created via the API — web UI only.)
 - [ ] Local signing config exists: `~/.thinking-errors-notepad/ios-release.env`
-      (same App Store Connect API key as AttuneTogether — team CLKKD53664)
+      (already in place — but see the key-role fix above)
 
 ## Every release
 
@@ -36,8 +51,10 @@ web UI. Listing copy lives in [listing.md](listing.md).
 
 ## First submission (listing)
 
-- [ ] Screenshots: 6.7" (1290×2796) required; 6.5" and 5.5" optional
-      (take on iPhone 15/16 Pro Max simulator: `xcrun simctl io booted screenshot`)
+- [ ] Screenshots: ready-made in [screenshots/](screenshots/) —
+      captured on the iPhone 17 Pro Max simulator at 1320×2868 (6.9" class):
+      first-launch notice, labeling, review, history, your-data.
+      Retake any time with `xcrun simctl io booted screenshot`.
 - [ ] Paste subtitle, promotional text, description, keywords from listing.md
 - [ ] Support URL + privacy policy URL (see listing.md)
 - [ ] App Privacy: **Data Not Collected**

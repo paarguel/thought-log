@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { FlowAction, FlowState } from "@/lib/thought-log/reducer";
 import { FEELING_GROUPS } from "@/lib/thought-log/feelings";
+import { dataNoticeAcknowledged } from "@/components/app/data-notice";
 import { StepFooter, StepHeader } from "./step-chrome";
 
 interface StepProps {
@@ -29,7 +30,8 @@ export function SituationStep({ state, dispatch }: StepProps) {
         onChange={(e) => dispatch({ type: "setSituation", value: e.target.value })}
         placeholder="e.g. My boss emailed asking to “talk tomorrow” with no other detail."
         aria-label="Describe the situation"
-        autoFocus
+        // Don't pop the keyboard under the first-launch notice.
+        autoFocus={dataNoticeAcknowledged()}
       />
       <StepFooter
         onNext={() => dispatch({ type: "next" })}
