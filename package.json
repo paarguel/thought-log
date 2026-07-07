@@ -1,17 +1,25 @@
 {
-  "name": "thought-log",
-  "version": "0.1.0",
+  "name": "thinking-errors-notepad",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "cap:sync": "npx cap sync ios",
+    "cap:open": "npx cap open ios",
+    "ios:doctor": "bash scripts/ios-doctor.sh",
+    "ios:release": "bash scripts/ios-release.sh",
+    "ios:archive": "bash scripts/ios-archive.sh",
+    "ios:upload": "bash scripts/ios-upload.sh",
+    "ios:testflight": "bash scripts/ios-testflight.sh"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.12.0",
-    "@supabase/supabase-js": "^2.110.0",
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1",
+    "@capacitor/ios": "^8.4.1",
     "idb": "^8.0.3",
     "next": "16.2.10",
     "react": "19.2.4",

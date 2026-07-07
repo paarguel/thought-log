@@ -2,43 +2,24 @@
 
 ## Topology
 
-- **App:** Next.js (App Router), deployed on Vercel. All pages are static or
-  client-rendered; there is no server-side handling of worksheet content.
-- **Cloud history:** Supabase project `thought-log` (`dktoxkyrbsqtqvonvuxv`,
-  us-west-1). Auth (email + password) and one Postgres table `thought_logs`.
+- **Web:** Next.js (App Router) with `output: 'export'` — a fully static
+  site in `out/`. Deployed on Vercel (or any static host). There is no
+  server-side handling of anything: no API routes, no env vars, no services.
+- **iOS:** the same static export is bundled into a Capacitor shell
+  (`ios/`) and served from disk inside the app — fully offline. See the
+  `ios:*` npm scripts and [docs/app-store/](../app-store/).
 
 ## Environment
 
-| Variable | Purpose |
-| --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Publishable key (`sb_publishable_…`) — safe to expose; all data access is gated by RLS |
+None. The app has no configuration and no secrets.
 
-Both are build-time public values, pinned in `vercel.json` (`build.env`) and in
-`.env.local` for local dev. If they are absent the app degrades gracefully to
-local-only mode.
+The only machine-local file is the iOS signing config
+(`~/.thinking-errors-notepad/ios-release.env`, App Store Connect API key),
+which never enters the repo.
 
-## Database schema
+## History
 
-Migrations live in `supabase/migrations/`. Security invariants any future
-migration must preserve:
-
-- RLS stays enabled on `thought_logs`.
-- Grants: `authenticated` only. Never grant to `anon`.
-- All four policies scoped `auth.uid() = user_id`.
-
-Run `get_advisors` (Supabase MCP) or the dashboard advisors after schema
-changes.
-
-## Auth settings (Supabase dashboard)
-
-- Email confirmation is ON: new signups must confirm via email before signing
-  in. Supabase's built-in SMTP has low hourly limits — fine for personal use;
-  configure custom SMTP before any wider launch.
-
-## Release checklist
-
-1. `npm run lint && npm run test && npm run build`
-2. Deploy (Vercel MCP `deploy_to_vercel` or `vercel deploy --prod`)
-3. Open the production URL on a phone: complete a local-only worksheet, watch
-   the network tab for content leaks, then a cloud save while signed in.
+Until July 2026 the app had an optional Supabase cloud-history mode. It was
+removed for the App Store release so the app can promise, structurally, that
+data never leaves the device (git history has the last cloud version if it's
+ever needed again).

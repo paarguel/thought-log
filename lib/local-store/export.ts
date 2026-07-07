@@ -6,8 +6,10 @@
  */
 
 import type { Worksheet } from "@/lib/thought-log/types";
-import { worksheetTitle } from "@/lib/thought-log/types";
+import { worksheetTitle, WORKSHEET_SCHEMA_VERSION } from "@/lib/thought-log/types";
 import { getDistortion } from "@/lib/thought-log/distortions";
+
+export const BACKUP_APP_ID = "thinking-errors-notepad";
 
 export function escapeHtml(text: string): string {
   return text
@@ -20,6 +22,67 @@ export function escapeHtml(text: string): string {
 
 export function worksheetToJson(w: Worksheet): string {
   return JSON.stringify(w, null, 2);
+}
+
+/**
+ * Full-device backup: every saved entry in one portable JSON file.
+ * This is the user's safety net — the app itself is not long-term storage.
+ */
+export function backupToJson(entries: Worksheet[]): string {
+  return JSON.stringify(
+    {
+      app: BACKUP_APP_ID,
+      schemaVersion: WORKSHEET_SCHEMA_VERSION,
+      exportedAt: new Date().toISOString(),
+      entries,
+    },
+    null,
+    2
+  );
+}
+
+export function backupFilename(): string {
+  const date = new Date().toISOString().slice(0, 10);
+  return `thinking-errors-notepad-backup-${date}.json`;
+}
+
+function isWorksheetLike(value: unknown): value is Worksheet {
+  if (typeof value !== "object" || value === null) return false;
+  const w = value as Record<string, unknown>;
+  return (
+    typeof w.id === "string" &&
+    typeof w.createdAt === "string" &&
+    typeof w.updatedAt === "string" &&
+    typeof w.thoughtText === "string" &&
+    Array.isArray(w.feelings) &&
+    Array.isArray(w.phrases)
+  );
+}
+
+/**
+ * Parse a backup file (or a single exported entry) back into worksheets.
+ * Throws a user-facing Error when the file isn't one of ours.
+ */
+export function parseBackupJson(text: string): Worksheet[] {
+  let data: unknown;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error("That file isn't valid JSON.");
+  }
+
+  // A single exported entry is also importable.
+  if (isWorksheetLike(data)) return [data];
+
+  if (typeof data === "object" && data !== null && Array.isArray((data as { entries?: unknown }).entries)) {
+    const entries = (data as { entries: unknown[] }).entries.filter(isWorksheetLike);
+    if (entries.length === 0) {
+      throw new Error("That backup file doesn't contain any entries.");
+    }
+    return entries;
+  }
+
+  throw new Error("That file doesn't look like a Thinking Errors NotePad backup.");
 }
 
 function formatDate(iso: string): string {
@@ -77,7 +140,7 @@ export function worksheetToPrintableHtml(w: Worksheet): string {
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>${escapeHtml(worksheetTitle(w))} — Thought Log</title>
+<title>${escapeHtml(worksheetTitle(w))} — Thinking Errors NotePad</title>
 <style>
   body { font-family: Georgia, 'Times New Roman', serif; color: #26221c; background: #faf6f0;
          max-width: 42rem; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.6; }
@@ -95,7 +158,7 @@ export function worksheetToPrintableHtml(w: Worksheet): string {
 </head>
 <body>
 <h1>${escapeHtml(worksheetTitle(w))}</h1>
-<p class="meta">${escapeHtml(formatDate(w.createdAt))} — Thought Log</p>
+<p class="meta">${escapeHtml(formatDate(w.createdAt))} — Thinking Errors NotePad</p>
 
 <h2>Situation</h2>
 <p>${escapeHtml(w.situation) || "—"}</p>
@@ -140,5 +203,5 @@ export function exportFilename(w: Worksheet, ext: "json" | "html"): string {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .slice(0, 40) || "entry";
-  return `thought-log-${date}-${slug}.${ext}`;
+  return `thinking-errors-${date}-${slug}.${ext}`;
 }
