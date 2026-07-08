@@ -68,8 +68,8 @@ func drawMotif(_ ctx: CGContext, origin: CGPoint, side: CGFloat) {
         let cy = midY + gap - CGFloat(i) * gap // i0 top, i1 middle, i2 bottom
         let y = cy - lineH / 2
         if i == 1 {
-            roundedBar(ctx, x: left - 36 * u, y: y - 32 * u, w: w * u + 156 * u, h: lineH + 64 * u,
-                       color: goldSoft, rotation: -0.03)
+            roundedBar(ctx, x: left - 40 * u, y: y - 32 * u, w: w * u + 112 * u, h: lineH + 64 * u,
+                       color: goldSoft)
             roundedBar(ctx, x: left, y: y, w: w * u, h: lineH, color: oxblood)
         } else {
             roundedBar(ctx, x: left, y: y, w: w * u, h: lineH, color: ink)

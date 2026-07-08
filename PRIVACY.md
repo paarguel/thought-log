@@ -54,4 +54,4 @@ anything is sent anywhere.
 ## Contact
 
 Questions: open an issue on the project repository, or email
-patrick.arguelles@gmail.com.
+support@urbanpyx.com.
