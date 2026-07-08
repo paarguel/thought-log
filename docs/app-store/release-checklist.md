@@ -1,37 +1,27 @@
-# iOS release checklist — Thinking Errors NotePad
+# iOS release checklist — Thought Record
 
 The scripted part is three commands; the manual part is App Store Connect
 web UI. Listing copy lives in [listing.md](listing.md).
 
 ## One-time setup (first release only)
 
-- [ ] **Fix the API key permissions** (verified blocker, July 2026): the
-      existing ASC API key (9WQYS5M8NZ, reused from AttuneTogether) can upload
-      builds but CANNOT touch Certificates, Identifiers & Profiles — both
-      `xcodebuild -allowProvisioningUpdates` and `POST /v1/bundleIds` fail with
-      "Unable to find a team with the given Team ID 'CLKKD53664'". That's
-      Apple's (misleading) insufficient-role error. Fix one of:
-      - **Preferred:** App Store Connect → Users and Access → Integrations →
-        create a new API key with **App Manager** (or Admin) role. Update
-        `~/.thinking-errors-notepad/ios-release.env` and drop the new `.p8`
-        into `~/.appstoreconnect/private_keys/`. Everything below then runs
-        scripted, including automatic bundle-ID registration.
-      - Or: sign into Xcode (Settings → Accounts) with the Apple ID that owns
-        team CLKKD53664, register the bundle ID at developer.apple.com →
-        Identifiers, then archive with `TEN_IOS_AUTH=xcode npm run ios:archive`.
-- [ ] **Register the bundle ID** `com.urbanpyx.thinkingerrors` (automatic with
-      an App Manager key on first archive; manual at developer.apple.com
-      otherwise)
+- [x] **API key / provisioning permissions** — RESOLVED 2026-07-08. The earlier
+      "Unable to find a team with the given Team ID 'CLKKD53664'" error was the
+      lapsed Developer Program membership, not the key's role. With the
+      membership active again, the existing ASC key (9WQYS5M8NZ) creates
+      provisioning resources fine.
+- [x] **Register the bundle ID** `com.urbanpyx.thinkingerrors` — registered
+      2026-07-08 via `POST /v1/bundleIds` (id `4Q87QC6D87`). Verify with
+      `node scripts/asc-api.mjs GET '/v1/bundleIds?filter[identifier]=com.urbanpyx.thinkingerrors'`.
 - [ ] **Create the app record** in [App Store Connect](https://appstoreconnect.apple.com)
-      → My Apps → **+** → New App:
+      → My Apps → **+** → New App (web UI only — the API forbids `apps` CREATE):
       - Platform: iOS
-      - Name: **Thinking Errors NotePad**
+      - Name: **Thought Record** (fall back to a variant if taken — see listing.md)
       - Primary language: English (U.S.)
       - Bundle ID: **com.urbanpyx.thinkingerrors**
-      - SKU: `thinking-errors-notepad`
-      (App records cannot be created via the API — web UI only.)
-- [ ] Local signing config exists: `~/.thinking-errors-notepad/ios-release.env`
-      (already in place — but see the key-role fix above)
+      - SKU: `thought-record`
+- [x] Local signing config exists: `~/.thinking-errors-notepad/ios-release.env`
+      (in place; config dir/env prefix kept as-is despite the app rename)
 
 ## Every release
 

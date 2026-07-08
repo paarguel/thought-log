@@ -15,10 +15,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Thinking Errors NotePad",
+  title: "Thought Record",
   description:
     "A private notepad for thinking errors. Write it out, circle the thoughts, name the patterns. Everything stays on your device.",
-  applicationName: "Thinking Errors NotePad",
+  applicationName: "Thought Record",
 };
 
 export const viewport: Viewport = {

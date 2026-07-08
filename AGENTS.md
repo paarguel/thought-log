@@ -4,7 +4,7 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
-# Thinking Errors NotePad — agent notes
+# Thought Record — agent notes
 
 Local-first CBT thought-record app. Web (Next.js static export) + iOS
 (Capacitor shell bundling `out/`). **Invariant: the app makes zero network

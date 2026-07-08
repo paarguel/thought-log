@@ -1,4 +1,4 @@
-# App Store listing — Thinking Errors NotePad
+# App Store listing — Thought Record
 
 Copy-paste source for the App Store Connect listing. Keep this file as the
 single source of truth; edit here first, then update ASC.
@@ -7,15 +7,20 @@ single source of truth; edit here first, then update ASC.
 
 | Field | Value |
 | --- | --- |
-| App name (App Store) | Thinking Errors NotePad |
-| Subtitle (30 chars max) | `Spot thoughts. Untangle them.` (29) |
+| App name (App Store) | Thought Record |
+| Subtitle (30 chars max) | `Spot thinking errors. Reframe.` (30) |
 | Bundle ID | `com.urbanpyx.thinkingerrors` |
-| SKU | `thinking-errors-notepad` |
+| SKU | `thought-record` |
 | Primary language | English (U.S.) |
 | Primary category | Health & Fitness |
 | Secondary category | Lifestyle |
 | Price | Free |
-| Home-screen display name | "Thinking Errors" (set in Info.plist) |
+| Home-screen display name | "Thought Record" (set in Info.plist) |
+
+> **Name availability:** "Thought Record" is a common phrase; if App Store
+> Connect reports the exact name is already taken when reserving it, fall back
+> to a minimally-differentiated variant (e.g. "Thought Record: CBT" or
+> "Thought Record — CBT Notes") and keep the home-screen name "Thought Record".
 
 ## Promotional text (170 chars max)
 
@@ -27,7 +32,7 @@ single source of truth; edit here first, then update ASC.
 
 ## Description
 
-> Thinking Errors NotePad is a quiet place to untangle a stressful moment,
+> Thought Record is a quiet place to untangle a stressful moment,
 > the way you would on a paper CBT worksheet — but built for your phone.
 >
 > WRITE IT OUT
@@ -58,13 +63,16 @@ single source of truth; edit here first, then update ASC.
 > Because entries live only on your device, deleting the app deletes them.
 > Export regularly — this is a working notepad, not long-term storage.
 >
-> Thinking Errors NotePad is free and open source. It is a self-help writing
+> Thought Record is free and open source. It is a self-help writing
 > tool, not therapy, medical advice, or a medical device. Many therapists use
 > thought records as homework between sessions — bring your exports along.
 
 ## Keywords (100 chars max)
 
-`cbt,thought record,cognitive,distortions,journal,anxiety,worksheet,therapy homework,reframe` (93)
+`cbt,thinking errors,cognitive,distortions,journal,anxiety,worksheet,therapy homework,reframe` (92)
+
+(The name "Thought Record" is auto-indexed by Apple, so the phrase is dropped
+from keywords here to reclaim space for "thinking errors".)
 
 ## URLs
 

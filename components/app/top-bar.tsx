@@ -12,9 +12,9 @@ export function TopBar() {
       <Link
         href="/"
         className="font-display italic text-[1.0625rem] text-ink tracking-tight"
-        aria-label="Thinking Errors NotePad — start"
+        aria-label="Thought Record — start"
       >
-        Thinking Errors NotePad
+        Thought Record
       </Link>
       <nav className="flex items-center gap-1" aria-label="App">
         <Link

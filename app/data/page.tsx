@@ -149,7 +149,7 @@ export default function DataPage() {
             About this app
           </h2>
           <p className="text-[0.8125rem] leading-relaxed text-ink-faint">
-            Thinking Errors NotePad is a free, open-source worksheet for noticing
+            Thought Record is a free, open-source worksheet for noticing
             thinking errors (cognitive distortions), in the style of CBT thought
             records. It is a self-help writing tool — it is not therapy, medical
             advice, or a medical device, and it does not diagnose or treat anything.

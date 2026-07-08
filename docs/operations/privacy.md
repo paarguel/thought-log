@@ -1,6 +1,6 @@
 # Privacy Posture
 
-Thinking Errors NotePad handles mental-health-adjacent writing. Content is
+Thought Record handles mental-health-adjacent writing. Content is
 private **by architecture**: there is no server, no account, and no network
 path for content to leave the device. The user-facing policy is
 [PRIVACY.md](../../PRIVACY.md) at the repo root.

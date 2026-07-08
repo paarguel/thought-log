@@ -1,8 +1,8 @@
-# Privacy Policy — Thinking Errors NotePad
+# Privacy Policy — Thought Record
 
-*Last updated: July 6, 2026*
+*Last updated: July 8, 2026*
 
-Thinking Errors NotePad is built so that we **cannot** see your data, because
+Thought Record is built so that we **cannot** see your data, because
 your data never reaches us.
 
 ## What we collect
@@ -36,7 +36,7 @@ writing. The app is a working notepad, not long-term storage.
 
 ## Not medical care
 
-Thinking Errors NotePad is a self-help writing tool inspired by CBT-style
+Thought Record is a self-help writing tool inspired by CBT-style
 thought records. It is not therapy, medical advice, diagnosis, or treatment,
 and it is not a medical device. If you are in crisis or need support, contact
 a licensed professional or your local emergency services.

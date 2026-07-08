@@ -1,4 +1,4 @@
-# Thinking Errors NotePad
+# Thought Record
 
 A private, mobile-first notepad for thinking errors. Write out what's in your
 head, circle the thoughts — like on a paper CBT worksheet — name the thinking

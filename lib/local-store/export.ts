@@ -9,7 +9,7 @@ import type { Worksheet } from "@/lib/thought-log/types";
 import { worksheetTitle, WORKSHEET_SCHEMA_VERSION } from "@/lib/thought-log/types";
 import { getDistortion } from "@/lib/thought-log/distortions";
 
-export const BACKUP_APP_ID = "thinking-errors-notepad";
+export const BACKUP_APP_ID = "thought-record";
 
 export function escapeHtml(text: string): string {
   return text
@@ -43,7 +43,7 @@ export function backupToJson(entries: Worksheet[]): string {
 
 export function backupFilename(): string {
   const date = new Date().toISOString().slice(0, 10);
-  return `thinking-errors-notepad-backup-${date}.json`;
+  return `thought-record-backup-${date}.json`;
 }
 
 function isWorksheetLike(value: unknown): value is Worksheet {
@@ -82,7 +82,7 @@ export function parseBackupJson(text: string): Worksheet[] {
     return entries;
   }
 
-  throw new Error("That file doesn't look like a Thinking Errors NotePad backup.");
+  throw new Error("That file doesn't look like a Thought Record backup.");
 }
 
 function formatDate(iso: string): string {
@@ -140,7 +140,7 @@ export function worksheetToPrintableHtml(w: Worksheet): string {
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>${escapeHtml(worksheetTitle(w))} — Thinking Errors NotePad</title>
+<title>${escapeHtml(worksheetTitle(w))} — Thought Record</title>
 <style>
   body { font-family: Georgia, 'Times New Roman', serif; color: #26221c; background: #faf6f0;
          max-width: 42rem; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.6; }
@@ -158,7 +158,7 @@ export function worksheetToPrintableHtml(w: Worksheet): string {
 </head>
 <body>
 <h1>${escapeHtml(worksheetTitle(w))}</h1>
-<p class="meta">${escapeHtml(formatDate(w.createdAt))} — Thinking Errors NotePad</p>
+<p class="meta">${escapeHtml(formatDate(w.createdAt))} — Thought Record</p>
 
 <h2>Situation</h2>
 <p>${escapeHtml(w.situation) || "—"}</p>
