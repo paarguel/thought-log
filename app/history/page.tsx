@@ -82,9 +82,9 @@ export default function HistoryPage() {
   const empty = local !== null && local.length === 0;
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-xl flex-col">
+    <div className="app-shell mx-auto flex w-full max-w-xl flex-col">
       <TopBar />
-      <main className="flex flex-1 flex-col px-5 pb-6">
+      <main className="app-scroll flex flex-col px-5 pb-6">
         <h1 className="mb-5 font-display text-[1.625rem] text-ink">History</h1>
 
         {empty && (

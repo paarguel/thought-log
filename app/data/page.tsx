@@ -66,9 +66,9 @@ export default function DataPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-xl flex-col">
+    <div className="app-shell mx-auto flex w-full max-w-xl flex-col">
       <TopBar />
-      <main className="flex flex-1 flex-col px-5 pb-8">
+      <main className="app-scroll flex flex-col px-5 pb-8">
         <h1 className="mb-2 font-display text-[1.625rem] text-ink">Your data</h1>
         <p className="mb-6 text-[0.9375rem] text-ink-soft">
           Everything you write stays on this device. There is no account, no cloud,

@@ -30,7 +30,7 @@ export function StepHeader({
         Step {index + 1} of {STEP_ORDER.length}
       </p>
       <h1 className="font-display text-[1.625rem] leading-snug text-ink">{title}</h1>
-      {hint ? <p className="mt-1.5 text-[0.9375rem] text-ink-soft">{hint}</p> : null}
+      {hint ? <p className="step-hint mt-1.5 text-[0.9375rem] text-ink-soft">{hint}</p> : null}
     </div>
   );
 }
@@ -49,7 +49,7 @@ export function StepFooter({
   children?: ReactNode;
 }) {
   return (
-    <div className="mt-auto pt-6 pb-2">
+    <div className="step-footer">
       {children}
       {onNext ? (
         <PrimaryButton onClick={onNext} disabled={nextDisabled}>

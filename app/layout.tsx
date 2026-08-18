@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import { DataNotice } from "@/components/app/data-notice";
+import { ViewportFit } from "@/components/app/viewport-fit";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -37,9 +38,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${inter.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${inter.variable} antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex flex-col">
+        <ViewportFit />
         {children}
         <DataNotice />
       </body>

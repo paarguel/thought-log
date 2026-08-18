@@ -147,7 +147,7 @@ export function SaveStep({
         </p>
       )}
 
-      <div className="mt-auto pt-6 pb-2 text-center">
+      <div className="step-footer text-center">
         {confirmDiscard ? (
           <div className="rounded-xl border border-line bg-paper-raised p-4 text-left">
             <p className="text-[0.9375rem] text-ink">

@@ -25,7 +25,7 @@ export function SituationStep({ state, dispatch }: StepProps) {
         hint="Just the facts of the moment — where you were, what occurred."
       />
       <textarea
-        className="write-surface min-h-36"
+        className="write-surface min-h-20 shrink grow-0 basis-36"
         value={state.worksheet.situation}
         onChange={(e) => dispatch({ type: "setSituation", value: e.target.value })}
         placeholder="e.g. My boss emailed asking to “talk tomorrow” with no other detail."
@@ -142,7 +142,7 @@ export function ThoughtsStep({ state, dispatch }: StepProps) {
         hint="Everything going through your head, unfiltered. Don't organize it — you'll circle the thoughts next."
       />
       <textarea
-        className="write-surface min-h-56 flex-1"
+        className="write-surface min-h-20 flex-1"
         value={state.worksheet.thoughtText}
         onChange={(e) => dispatch({ type: "setThoughtText", value: e.target.value })}
         placeholder="Let it pour out…"
@@ -175,7 +175,7 @@ export function RationalStep({ state, dispatch }: StepProps) {
       />
       <textarea
         ref={ref}
-        className="write-surface min-h-40"
+        className="write-surface min-h-20 shrink grow-0 basis-40"
         value={w.rationalThought}
         onChange={(e) => dispatch({ type: "setRational", value: e.target.value })}
         placeholder="It might be true that… but…"

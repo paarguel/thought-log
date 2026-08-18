@@ -51,11 +51,63 @@ body {
   color: var(--ink);
   font-family: var(--font-inter), system-ui, sans-serif;
   -webkit-tap-highlight-color: transparent;
+}
+
+/*
+  The app is exactly as tall as the *visible* viewport and scrolls inside
+  itself, so a step's action stays above the iOS keyboard instead of hiding
+  under it. <ViewportFit> keeps --app-vh in step; the dvh fallback is what a
+  browser without the visual viewport API gets.
+*/
+html,
+body {
+  height: var(--app-vh, 100dvh);
+  overflow: hidden;
+}
+
+.app-shell {
+  height: 100%;
   /* Keep content clear of the notch/home indicator in the native shell. */
   padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* The one scrolling region inside the shell. */
+.app-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/*
+  While a field has focus the keyboard owns half the screen. Stand the
+  guidance down and stop reserving room for the home indicator the keyboard
+  is already covering — that's the ~80px that keeps the writing surface and
+  the action from colliding. Browsers without :has() just keep the hint.
+*/
+.app-shell:has(textarea:focus, input:focus) .step-hint {
+  display: none;
+}
+
+.app-shell:has(textarea:focus, input:focus) {
+  padding-bottom: 0;
+}
+
+/*
+  A step's action rides the bottom of the scroll area: always reachable,
+  never a scroll-to-the-end hunt, and never under the keyboard. Content
+  fades out behind it rather than being clipped mid-line.
+*/
+.step-footer {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  padding-top: 1.5rem;
+  padding-bottom: 1.25rem;
+  background: linear-gradient(to bottom, transparent, var(--paper) 1.25rem);
 }
 
 /* Subtle paper grain so the field never reads as flat white */

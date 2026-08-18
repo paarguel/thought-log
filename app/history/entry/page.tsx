@@ -68,7 +68,7 @@ function EntryDetail() {
   };
 
   return (
-    <main className="flex flex-1 flex-col px-5 pb-8">
+    <main className="app-scroll flex flex-col px-5 pb-8">
       {entry === undefined && <p className="text-[0.875rem] text-ink-faint">Loading…</p>}
 
       {entry === null && (
@@ -177,7 +177,7 @@ function EntryDetail() {
 
 export default function EntryDetailPage() {
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-xl flex-col">
+    <div className="app-shell mx-auto flex w-full max-w-xl flex-col">
       <TopBar />
       <Suspense fallback={<p className="px-5 text-[0.875rem] text-ink-faint">Loading…</p>}>
         <EntryDetail />

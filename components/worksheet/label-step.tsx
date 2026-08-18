@@ -126,6 +126,7 @@ export function LabelStep({
           }
         }}
         nextLabel={isLast ? "Continue" : "Next thought"}
+        onBack={() => dispatch({ type: "back" })}
       >
         {clamped > 0 && (
           <div className="mb-1 text-center">
@@ -135,9 +136,6 @@ export function LabelStep({
           </div>
         )}
       </StepFooter>
-      <div className="pb-2 text-center">
-        <GhostButton onClick={() => dispatch({ type: "back" })}>Back</GhostButton>
-      </div>
     </section>
   );
 }
