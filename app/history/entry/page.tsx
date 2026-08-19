@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Worksheet } from "@/lib/thought-log/types";
 import { worksheetTitle } from "@/lib/thought-log/types";
-import { getLocalEntry, deleteLocalEntry } from "@/lib/local-store/indexed-db";
+import { getLocalEntry, deleteLocalEntry, saveLocalEntry } from "@/lib/local-store/indexed-db";
 import {
   downloadFile,
   exportFilename,
@@ -22,6 +22,7 @@ import {
 } from "@/lib/local-store/export";
 import { TopBar } from "@/components/app/top-bar";
 import { MarkedPassage } from "@/components/worksheet/review-step";
+import { NotesSection } from "@/components/entry/notes-section";
 import { GhostButton, SecondaryButton } from "@/components/ui/buttons";
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
@@ -56,6 +57,14 @@ function EntryDetail() {
 
   // No id in the URL means there is nothing to load — treat as not found.
   const entry = id ? loaded : null;
+
+  const saveNotes = async (notes: string) => {
+    if (!entry) return;
+    const next: Worksheet = { ...entry, notes: notes || undefined };
+    if (!notes) delete next.notes;
+    await saveLocalEntry(next);
+    setLoaded(next);
+  };
 
   const remove = async () => {
     try {
@@ -120,18 +129,33 @@ function EntryDetail() {
             </p>
           </Section>
 
+          <NotesSection notes={entry.notes} onSave={saveNotes} />
+
           <div className="mt-2 flex flex-wrap gap-2">
             <SecondaryButton
               onClick={() =>
                 downloadFile(
                   exportFilename(entry, "html"),
-                  worksheetToPrintableHtml(entry),
+                  worksheetToPrintableHtml(entry, { includeNotes: false }),
                   "text/html"
                 )
               }
             >
-              Export printable
+              {entry.notes ? "Export printable (no notes)" : "Export printable"}
             </SecondaryButton>
+            {entry.notes && (
+              <SecondaryButton
+                onClick={() =>
+                  downloadFile(
+                    exportFilename(entry, "html"),
+                    worksheetToPrintableHtml(entry, { includeNotes: true }),
+                    "text/html"
+                  )
+                }
+              >
+                Export printable (with notes)
+              </SecondaryButton>
+            )}
             <SecondaryButton
               onClick={() =>
                 downloadFile(exportFilename(entry, "json"), worksheetToJson(entry), "application/json")

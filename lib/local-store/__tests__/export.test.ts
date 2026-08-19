@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { escapeHtml, worksheetToJson, worksheetToPrintableHtml, exportFilename } from "../export";
+import {
+  escapeHtml,
+  worksheetToJson,
+  worksheetToPrintableHtml,
+  exportFilename,
+  backupToJson,
+  parseBackupJson,
+} from "../export";
 import { newWorksheet } from "@/lib/thought-log/types";
 
 function sampleWorksheet() {
@@ -58,5 +65,64 @@ describe("exportFilename", () => {
     const w = sampleWorksheet();
     const name = exportFilename(w, "html");
     expect(name).toMatch(/^thinking-errors-2026-07-02-[a-z0-9-]+\.html$/);
+  });
+});
+
+describe("notes in exports", () => {
+  function withNotes() {
+    const w = sampleWorksheet();
+    w.notes = "Therapist: <em>still</em> bracing for bad news.\nAsk before assuming.";
+    return w;
+  }
+
+  it("leaves notes out of the printable copy by default", () => {
+    const html = worksheetToPrintableHtml(withNotes());
+    expect(html).not.toContain("bracing for bad news");
+    expect(html).not.toContain("<h2>Notes</h2>");
+  });
+
+  it("includes notes in the printable copy when asked", () => {
+    const html = worksheetToPrintableHtml(withNotes(), { includeNotes: true });
+    expect(html).toContain("<h2>Notes</h2>");
+    expect(html).toContain("Ask before assuming.");
+  });
+
+  it("escapes notes in the printable copy", () => {
+    const html = worksheetToPrintableHtml(withNotes(), { includeNotes: true });
+    expect(html).not.toContain("<em>still</em>");
+    expect(html).toContain("&lt;em&gt;still&lt;/em&gt;");
+  });
+
+  it("produces the same printable copy either way when there are no notes", () => {
+    const w = sampleWorksheet();
+    expect(worksheetToPrintableHtml(w, { includeNotes: true })).toBe(
+      worksheetToPrintableHtml(w)
+    );
+  });
+
+  it("round-trips notes through a backup, and entries without notes stay without", () => {
+    const noted = withNotes();
+    const plain = sampleWorksheet();
+    plain.id = "plain-id";
+
+    const parsed = parseBackupJson(backupToJson([noted, plain]));
+
+    expect(parsed).toHaveLength(2);
+    expect(parsed.find((w) => w.id === noted.id)?.notes).toBe(noted.notes);
+    expect(parsed.find((w) => w.id === "plain-id")?.notes).toBeUndefined();
+  });
+
+  it("still imports a version-1 backup written before notes existed", () => {
+    const legacy = JSON.stringify({
+      app: "thought-record",
+      schemaVersion: 1,
+      exportedAt: "2026-07-02T10:00:00.000Z",
+      entries: [{ ...sampleWorksheet(), schemaVersion: 1 }],
+    });
+
+    const parsed = parseBackupJson(legacy);
+
+    expect(parsed).toHaveLength(1);
+    expect(parsed[0].notes).toBeUndefined();
   });
 });

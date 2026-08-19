@@ -10,7 +10,7 @@
  * words on paper — the page itself is never rewritten).
  */
 
-export const WORKSHEET_SCHEMA_VERSION = 1;
+export const WORKSHEET_SCHEMA_VERSION = 2;
 
 export interface Feeling {
   id: string;
@@ -46,6 +46,14 @@ export interface Worksheet {
   phrases: MarkedPhrase[];
   rationalThought: string;
   reviewModeLastUsed: ReviewMode;
+  /**
+   * Free-text notes added while reviewing a saved entry — corrections and
+   * adjustments, often worked out with a therapist. Never written during the
+   * worksheet flow, and never a rewrite of anything above: the worksheet is
+   * the record, this is what was learned about it afterwards. Absent until
+   * the user writes some.
+   */
+  notes?: string;
 }
 
 export type StepId =

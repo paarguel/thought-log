@@ -119,8 +119,15 @@ function passageHtml(w: Worksheet): string {
 /**
  * Self-contained printable HTML document. Opens cleanly in any browser,
  * prints like the paper worksheet, and can be shared with a therapist.
+ *
+ * Notes are left out unless asked for: this is the copy that gets handed to
+ * someone else, and a caller that forgets the option should under-share
+ * rather than over-share.
  */
-export function worksheetToPrintableHtml(w: Worksheet): string {
+export function worksheetToPrintableHtml(
+  w: Worksheet,
+  { includeNotes = false }: { includeNotes?: boolean } = {}
+): string {
   const feelings = w.feelings
     .map((f) => escapeHtml(f.name) + (f.intensity ? ` (${f.intensity}/5)` : ""))
     .join(" · ");
@@ -178,6 +185,12 @@ ${
 
 <h2>A more balanced thought</h2>
 <div class="rational"><p>${escapeHtml(w.rationalThought) || "—"}</p></div>
+${
+  includeNotes && w.notes?.trim()
+    ? `<h2>Notes</h2>
+<p>${escapeHtml(w.notes).replace(/\n/g, "<br/>")}</p>`
+    : ""
+}
 </body>
 </html>`;
 }
