@@ -4,17 +4,20 @@
 
 - Apple reference verified via App Store Connect API: **Thought Record: CBT Notes**, app `6788916753`, version **1.0.1**, `READY_FOR_SALE`.
 - Google Play organization account: **UrbanPyx**, account `7257870420459558056`.
-- Identity verified. Console still requires private contact and public developer phone verification; **Create app is disabled**. Patrick is completing those verifications.
+- Identity and both phone numbers verified; Create app is enabled.
 - Android package added: `com.urbanpyx.thinkingerrors`, version 1.0.1, version code 1.
-- Native bundle **not yet built or uploaded**. SDK installation awaits Patrick's license approval.
+- Signed native bundle built and signature verified; **not yet uploaded**. Create-app form is prepared and awaits owner approval of Play declarations, signing terms, and installer-protection setting.
 - Web verification: lint, 46 tests, and static production build passed.
-- Store icon (512×512) and feature graphic (1024×500) generated from the existing artwork and visually reviewed; native screenshots remain pending.
+- Native `lintRelease`, `bundleRelease`, and `assembleRelease` passed. Native lint reports zero errors and 29 warnings.
+- Store icon (512×512), feature graphic (1024×500), and four actual Android screenshots (1080×1920) are prepared and visually reviewed. Screenshots contain only synthetic entries.
+- Intended target ages remain an owner decision. No Play app, review submission, or public Play listing exists yet.
 
 ## Local build setup
 
-Installed: Homebrew OpenJDK 21 and Android command-line tools. SDK packages
-requested: platform tools, platform 36, build tools 36.0.0, emulator, and API 36
-Google APIs ARM64 system image. Their license acceptance is still pending.
+Installed: Homebrew OpenJDK 21, Android command-line tools, platform tools,
+platform 36, build tools 35.0.0 and 36.0.0, emulator, and API 36 Google APIs
+ARM64 system image. Patrick authorized SDK license acceptance on September 24;
+licenses were accepted and installation completed.
 
 ```bash
 export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
@@ -40,16 +43,17 @@ Increment `versionCode` in `android/app/build.gradle` for every later upload.
 
 ## Before upload
 
-- [ ] Accept SDK licenses and install required packages.
-- [ ] Native `lintRelease`, `assembleDebug`, and signed `bundleRelease` pass.
-- [ ] Inspect merged release manifest: no Internet permission; backup disabled.
-- [ ] Android smoke: first-launch notice, worksheet, highlighting/labels, save,
+- [x] Accept SDK licenses and install required packages.
+- [x] Native `lintRelease`, `assembleRelease`, and signed `bundleRelease` pass.
+- [x] Inspect merged release manifest: no Internet permission; backup disabled.
+- [x] Android smoke: first-launch notice, worksheet, highlighting/labels, save,
       history/detail, notes, navigation/back button, keyboard and safe areas.
-- [ ] Export JSON and printable HTML through local picker; cancellation must not
+- [x] Export JSON and printable HTML through local picker; cancellation must not
       report success. Import JSON and verify entries/notes survive.
-- [ ] Relaunch in airplane mode and verify persistence.
-- [ ] Capture synthetic Android screenshots and create store feature graphic.
-- [ ] Complete phone verification and create free English app in Console.
+- [x] Relaunch in airplane mode and verify persistence.
+- [x] Capture synthetic Android screenshots and create store feature graphic.
+- [x] Complete phone verification.
+- [ ] Create free English app in Console after owner approves declarations.
 - [ ] Complete listing, privacy policy, data safety, app access, ads, content
       rating, target audience, health declaration, and financial declaration.
 - [ ] Upload signed AAB, enroll in Play App Signing, resolve Console validation.
@@ -59,3 +63,22 @@ Increment `versionCode` in `android/app/build.gradle` for every later upload.
 Listing copy and supported declaration answers are in [listing.md](listing.md).
 Legal agreements and any unsupported owner attestations require Patrick's input.
 This checklist is not proof of publication or native-device verification.
+
+## Native test receipt
+
+Tested the signed release APK in `ThoughtRecord_API36` (Pixel 7 ARM64 emulator).
+The full worksheet saved a synthetic entry with a Mind reading label, balanced
+thought and notes. JSON export saved through the Android document picker;
+canceling showed cancellation rather than success. Imported the backup and
+verified the existing entry and notes. Printable HTML contained the balanced
+thought and label and excluded notes when requested. Force-stop/relaunch in
+airplane mode preserved the entry. Android system Back now returns from entry
+detail to History. Privacy policy is available offline under Your data.
+
+Bundle: `android/app/build/outputs/bundle/release/app-release.aab`
+
+SHA-256: `ffea0c795a71879ebe6fd08d98a89e9908a333ee211ce63981a7b4900a012343`
+
+No physical-device test or Play pre-launch report has been completed. The
+synthetic backup and printable export were inspected outside the repository;
+no personal journal data was used.
