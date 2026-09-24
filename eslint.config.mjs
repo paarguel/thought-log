@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Capacitor iOS shell (generated web assets + native project)
     "ios/**",
+    "android/**",
   ]),
 ]);
 

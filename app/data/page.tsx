@@ -40,10 +40,11 @@ export default function DataPage() {
         fail("Nothing to back up yet — no entries are saved on this device.");
         return;
       }
-      downloadFile(backupFilename(), backupToJson(entries), "application/json");
+      const saved = await downloadFile(backupFilename(), backupToJson(entries), "application/json");
+      if (!saved) { say("Export canceled. Your entries are still on this device."); return; }
       say(`Backup exported: ${entries.length} ${entries.length === 1 ? "entry" : "entries"}.`);
     } catch {
-      fail("Couldn't read the entries on this device.");
+      fail("Couldn't export the backup. Your entries are still on this device.");
     }
   };
 

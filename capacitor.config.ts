@@ -6,6 +6,10 @@ const config: CapacitorConfig = {
   // The static export is bundled into the app and served from disk.
   // No server block: the app is fully offline and never talks to a network.
   webDir: 'out',
+  android: {
+    // Export calls carry private writing; never log plugin arguments.
+    loggingBehavior: 'none',
+  },
 };
 
 export default config;

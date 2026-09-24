@@ -72,6 +72,26 @@ The app icon and splash are generated, not hand-drawn — edit
 `scripts/generate-app-art.swift` and run `swift scripts/generate-app-art.swift`,
 then `npx @capacitor/assets generate --ios`.
 
+## Android / Google Play
+
+The same offline static app is bundled into `android/`, package
+`com.urbanpyx.thinkingerrors`, version 1.0.1 (version code 1).
+
+```bash
+npm run android:sync     # build web and copy into Android
+npm run android:open     # optional: open Android Studio
+npm run android:release  # checks, signed release bundle, native lint
+```
+
+Requires JDK 21 and Android SDK 36. Signing keys live outside the repo in
+`~/.thinking-errors-notepad/`. Setup, upload status, and verification steps:
+[Google Play release checklist](docs/google-play/release-checklist.md).
+Google Play listing copy: [listing.md](docs/google-play/listing.md).
+
+The Android manifest removes Internet permission and excludes app data from
+cloud backup and device transfer. File exports use Android's local document
+picker and do not need broad storage access.
+
 ## License
 
 [MIT](LICENSE) — free to use, copy, and adapt.

@@ -75,13 +75,19 @@ export function SaveStep({
     }
   };
 
-  const exportPrintable = () => {
-    downloadFile(exportFilename(w, "html"), worksheetToPrintableHtml(w), "text/html");
+  const exportEntry = async (ext: "html" | "json") => {
+    try {
+      await downloadFile(
+        exportFilename(w, ext),
+        ext === "html" ? worksheetToPrintableHtml(w) : worksheetToJson(w),
+        ext === "html" ? "text/html" : "application/json"
+      );
+    } catch {
+      setStatus({ kind: "error", message: "Couldn't export the file. Your draft is still on this device." });
+    }
   };
-
-  const exportJson = () => {
-    downloadFile(exportFilename(w, "json"), worksheetToJson(w), "application/json");
-  };
+  const exportPrintable = () => exportEntry("html");
+  const exportJson = () => exportEntry("json");
 
   const discard = async () => {
     await clearDraft();

@@ -5,6 +5,8 @@
  * content is untrusted even when it belongs to the current user. (R21, KTD9)
  */
 
+import { Capacitor, registerPlugin } from "@capacitor/core";
+
 import type { Worksheet } from "@/lib/thought-log/types";
 import { worksheetTitle, WORKSHEET_SCHEMA_VERSION } from "@/lib/thought-log/types";
 import { getDistortion } from "@/lib/thought-log/distortions";
@@ -195,8 +197,16 @@ ${
 </html>`;
 }
 
-/** Trigger a browser file download. No network involved. */
-export function downloadFile(filename: string, content: string, mime: string): void {
+const localExport = registerPlugin<{
+  save(options: { filename: string; content: string; mime: string }): Promise<{ saved: boolean }>;
+}>("LocalExport");
+
+/** Android uses its local file picker; web/iOS retain browser downloads. */
+export async function downloadFile(filename: string, content: string, mime: string): Promise<boolean> {
+  if (Capacitor.getPlatform() === "android") {
+    const result = await localExport.save({ filename, content, mime });
+    return result.saved;
+  }
   const blob = new Blob([content], { type: mime });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -206,6 +216,7 @@ export function downloadFile(filename: string, content: string, mime: string): v
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+  return true;
 }
 
 export function exportFilename(w: Worksheet, ext: "json" | "html"): string {

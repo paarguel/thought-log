@@ -7,6 +7,7 @@
 // Usage: swift scripts/generate-app-art.swift
 // Writes: assets/icon-only.png (1024), assets/splash.png + splash-dark.png (2732)
 
+import CoreText
 import CoreGraphics
 import Foundation
 import ImageIO
@@ -106,3 +107,39 @@ for name in ["splash", "splash-dark"] {
     drawMotif(splash, origin: CGPoint(x: (2732 - side) / 2, y: (2732 - side) / 2), side: side)
     writePNG(splash, to: "assets/\(name).png")
 }
+
+// Google Play assets use the same code-native artwork as the Apple release.
+try? fm.createDirectory(atPath: "docs/google-play/graphics", withIntermediateDirectories: true)
+let playIcon = makeContext(size: 512)
+playIcon.setFillColor(cream)
+playIcon.fill(CGRect(x: 0, y: 0, width: 512, height: 512))
+ruleFrame(playIcon, canvas: 512, scale: 0.5)
+drawMotif(playIcon, origin: .zero, side: 512)
+writePNG(playIcon, to: "docs/google-play/graphics/icon.png")
+
+let feature = CGContext(data: nil, width: 1024, height: 500, bitsPerComponent: 8,
+    bytesPerRow: 0, space: CGColorSpace(name: CGColorSpace.sRGB)!,
+    bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)!
+feature.setFillColor(cream)
+feature.fill(CGRect(x: 0, y: 0, width: 1024, height: 500))
+feature.setStrokeColor(gold)
+feature.setLineWidth(1)
+feature.stroke(CGRect(x: 30, y: 30, width: 964, height: 440))
+feature.saveGState()
+feature.translateBy(x: 46, y: 90)
+ruleFrame(feature, canvas: 320, scale: 320 / 1024)
+drawMotif(feature, origin: .zero, side: 320)
+feature.restoreGState()
+func playText(_ text: String, font: String, size: CGFloat, x: CGFloat, y: CGFloat, color: CGColor) {
+    let attrs: [NSAttributedString.Key: Any] = [
+        NSAttributedString.Key(kCTFontAttributeName as String): CTFontCreateWithName(font as CFString, size, nil),
+        NSAttributedString.Key(kCTForegroundColorAttributeName as String): color
+    ]
+    let line = CTLineCreateWithAttributedString(NSAttributedString(string: text, attributes: attrs))
+    feature.textPosition = CGPoint(x: x, y: y)
+    CTLineDraw(line, feature)
+}
+playText("Thought Record", font: "Georgia", size: 54, x: 386, y: 278, color: ink)
+playText("Spot thinking errors. Reframe.", font: "HelveticaNeue", size: 25, x: 390, y: 224, color: oxblood)
+playText("Your words stay on your device.", font: "HelveticaNeue", size: 20, x: 390, y: 163, color: ink)
+writePNG(feature, to: "docs/google-play/graphics/feature.png")

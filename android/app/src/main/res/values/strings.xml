@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Thought Record</string>
+    <string name="title_activity_main">Thought Record</string>
+    <string name="package_name">com.urbanpyx.thinkingerrors</string>
+    <string name="custom_url_scheme">com.urbanpyx.thinkingerrors</string>
+</resources>

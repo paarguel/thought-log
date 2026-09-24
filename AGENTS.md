@@ -6,8 +6,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Thought Record — agent notes
 
-Local-first CBT thought-record app. Web (Next.js static export) + iOS
-(Capacitor shell bundling `out/`). **Invariant: the app makes zero network
+Local-first CBT thought-record app. Web (Next.js static export) + iOS / Android
+(Capacitor shells bundling `out/`). **Invariant: the app makes zero network
 requests.** Do not add fetch calls, analytics, cloud SDKs, or remote assets;
 see docs/operations/privacy.md before touching anything data-related.
 
@@ -18,6 +18,8 @@ see docs/operations/privacy.md before touching anything data-related.
 - `lib/thought-log/` — domain logic (reducer, distortion catalog, segmenter)
 - `lib/local-store/` — IndexedDB persistence + file exports
 - `scripts/ios-*.sh` — release pipeline (see README and docs/app-store/)
+- `android/` — offline native shell, local document export, backup exclusions
+- `scripts/android-release.sh` — signed Google Play bundle; docs/google-play/
 - `scripts/generate-app-art.swift` — icon/splash generator (CoreGraphics)
 
 ## Conventions
