@@ -6,11 +6,15 @@
 - Google Play organization account: **UrbanPyx**, account `7257870420459558056`.
 - Identity and both phone numbers verified; Create app is enabled.
 - Android package added: `com.urbanpyx.thinkingerrors`, version 1.0.1, version code 1.
-- Signed native bundle built and signature verified; **not yet uploaded**. Create-app form is prepared and awaits owner approval of Play declarations, signing terms, and installer-protection setting.
+- Signed native bundle built and signature verified; **not yet uploaded**.
+- Patrick approved the pending Play declarations and settings. Created free English app **Thought Record: CBT Notes**, Play app ID `4975077118867870359`; accepted signing/policy/export declarations and turned automatic installer protection off.
+- Saved privacy policy, unrestricted app access, no ads, and non-government declarations. Financial-features form is open; remaining content forms and store listing are unfinished.
 - Web verification: lint, 46 tests, and static production build passed.
 - Native `lintRelease`, `bundleRelease`, and `assembleRelease` passed. Native lint reports zero errors and 29 warnings.
 - Store icon (512×512), feature graphic (1024×500), and four actual Android screenshots (1080×1920) are prepared and visually reviewed. Screenshots contain only synthetic entries.
-- Intended target ages remain an owner decision. No Play app, review submission, or public Play listing exists yet.
+- Intended target ages remain an owner decision. No review submission or public Play listing exists yet.
+- Browser control paused because another Chrome extension panel is open; owner must dismiss it before automation can continue.
+- Resume in [Play Console](https://play.google.com/console/u/0/developers/7257870420459558056/app/4975077118867870359/app-dashboard).
 
 ## Local build setup
 
@@ -53,7 +57,7 @@ Increment `versionCode` in `android/app/build.gradle` for every later upload.
 - [x] Relaunch in airplane mode and verify persistence.
 - [x] Capture synthetic Android screenshots and create store feature graphic.
 - [x] Complete phone verification.
-- [ ] Create free English app in Console after owner approves declarations.
+- [x] Create free English app in Console after owner approves declarations.
 - [ ] Complete listing, privacy policy, data safety, app access, ads, content
       rating, target audience, health declaration, and financial declaration.
 - [ ] Upload signed AAB, enroll in Play App Signing, resolve Console validation.

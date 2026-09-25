@@ -93,8 +93,8 @@ cloud backup and device transfer. File exports use Android's local document
 picker and do not need broad storage access.
 
 The signed Android release passed API 36 emulator testing on September 24,
-2026, including offline persistence and backup/printable exports. Google Play
-creation and upload are pending owner declarations; it is not published yet.
+2026, including offline persistence and backup/printable exports. The Google Play
+app is created; store setup and bundle upload remain incomplete. It is not published yet.
 
 ## License
 
