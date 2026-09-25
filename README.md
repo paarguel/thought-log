@@ -95,8 +95,11 @@ picker and do not need broad storage access.
 The signed Android release passed API 36 emulator testing on September 24,
 2026, including offline persistence and backup/printable exports. Google Play has
 accepted the bundle and published the internal release, with no testers selected.
-The store listing is saved; audience, content rating and final data safety remain
-incomplete. No public production release has been submitted.
+The production release and store listing were submitted September 24, 2026;
+Play Console shows **Changes in review**, with automated quick checks still
+running at verification. Intended audience is 13+, with no data collected or
+shared. Approved changes will publish automatically in the selected 177
+countries/regions. Public availability has not yet been verified.
 
 ## License
 

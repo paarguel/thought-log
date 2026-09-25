@@ -60,7 +60,9 @@ First Android release. Write out a stressful moment, highlight thoughts, name th
 - No Health Connect, health sensors, research studies, or regulated medical-device functionality.
 - Financial features: none.
 - Content: no developer-provided violence, sexual content, gambling, controlled substances, or user-to-user communication. User notes remain private.
-- Target audience: confirm intended ages in Console; Apple 4+ is a content rating, not evidence that this product targets children.
+- Target audience: ages 13–15, 16–17, and 18+, selected by Patrick on September 24, 2026. The app is not intended for children under 13. This describes the intended audience, not an enforced age gate.
+- IARC questionnaire completed with Patrick's terms approval: ESRB Everyone / PEGI 3. Content ratings are separate from the intended audience.
+- Advertising ID: not used, including by bundled SDKs.
 
 ## Graphics
 
