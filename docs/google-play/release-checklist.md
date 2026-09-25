@@ -6,14 +6,16 @@
 - Google Play organization account: **UrbanPyx**, account `7257870420459558056`.
 - Identity and both phone numbers verified; Create app is enabled.
 - Android package added: `com.urbanpyx.thinkingerrors`, version 1.0.1, version code 1.
-- Signed native bundle built and signature verified; **not yet uploaded**.
+- Signed native bundle uploaded and accepted by Google Play as version 1 (1.0.1), minimum API 24, target API 36. Internal release published September 24 at 8:53 PM; Console says **Available to internal testers**, **Not reviewed**. No testers are selected, so the track is inactive and nobody has access yet.
 - Patrick approved the pending Play declarations and settings. Created free English app **Thought Record: CBT Notes**, Play app ID `4975077118867870359`; accepted signing/policy/export declarations and turned automatic installer protection off.
-- Saved privacy policy, unrestricted app access, no ads, and non-government declarations. Financial-features form is open; remaining content forms and store listing are unfinished.
+- Eight of eleven setup sections complete: privacy policy, unrestricted app access, no ads, non-government, no financial features, health (mental/behavioral health and stress management), Health & Fitness category/contact details, and default English store listing.
+- Store description, 512px icon, feature graphic, and four native screenshots are uploaded and saved, ready to send for review. Screenshots show actual app UI; artwork was rendered from the existing native drawing script.
+- Data safety is saved as a draft declaring no data collected or shared. Finalization requires target audience. Content-rating form has the public support email and All Other App Types selected; separate IARC Terms of Use approval remains pending.
 - Web verification: lint, 46 tests, and static production build passed.
 - Native `lintRelease`, `bundleRelease`, and `assembleRelease` passed. Native lint reports zero errors and 29 warnings.
 - Store icon (512×512), feature graphic (1024×500), and four actual Android screenshots (1080×1920) are prepared and visually reviewed. Screenshots contain only synthetic entries.
 - Intended target ages remain an owner decision. No review submission or public Play listing exists yet.
-- Browser control paused because another Chrome extension panel is open; owner must dismiss it before automation can continue.
+- Browser control recovered. Remaining owner input: intended age audience and approval of the separate IARC Terms of Use. No production release has been submitted.
 - Resume in [Play Console](https://play.google.com/console/u/0/developers/7257870420459558056/app/4975077118867870359/app-dashboard).
 
 ## Local build setup
@@ -33,8 +35,9 @@ An RSA 4096 upload key was generated at
 `~/.thinking-errors-notepad/android-upload.jks`; its configuration is
 `~/.thinking-errors-notepad/android-signing.properties` (both mode 0600).
 Passwords and keys never enter git. Preserve a secure backup of this upload key;
-no off-machine key backup has been verified. Play App Signing enrollment still
-needs to happen when the first bundle is uploaded.
+no off-machine key backup has been verified. Play App Signing is active: the
+uploaded bundle is signed by Google Play, automatic protection is off, and
+automatic app text translation is off.
 
 ```bash
 npm run android:release
@@ -60,7 +63,8 @@ Increment `versionCode` in `android/app/build.gradle` for every later upload.
 - [x] Create free English app in Console after owner approves declarations.
 - [ ] Complete listing, privacy policy, data safety, app access, ads, content
       rating, target audience, health declaration, and financial declaration.
-- [ ] Upload signed AAB, enroll in Play App Signing, resolve Console validation.
+- [x] Upload signed AAB, enroll in Play App Signing, resolve Console validation.
+- [x] Publish internal release. Warnings: no testers selected; no deobfuscation file (build does not use R8/ProGuard obfuscation).
 - [ ] Run internal testing/pre-launch report and review results.
 - [ ] Submit production release for Google review; record actual status and URL.
 
@@ -83,6 +87,8 @@ Bundle: `android/app/build/outputs/bundle/release/app-release.aab`
 
 SHA-256: `ffea0c795a71879ebe6fd08d98a89e9908a333ee211ce63981a7b4900a012343`
 
-No physical-device test or Play pre-launch report has been completed. The
+No physical-device test or Play pre-launch report has been completed. The report
+overview still shows the initial upload-artifacts message after internal release.
+The
 synthetic backup and printable export were inspected outside the repository;
 no personal journal data was used.

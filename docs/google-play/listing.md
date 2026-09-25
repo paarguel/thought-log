@@ -54,7 +54,8 @@ First Android release. Write out a stressful moment, highlight thoughts, name th
 - App access: all functionality available without restrictions; no login.
 - Ads: none.
 - Data safety: no user data collected or shared by the developer; no account.
-- Health features: mental and behavioral health / self-help thought records.
+- Health features: mental and behavioral health / self-help thought records;
+  stress management, relaxation, mental acuity.
   Do not answer “no health features” merely because it is not a medical device.
 - No Health Connect, health sensors, research studies, or regulated medical-device functionality.
 - Financial features: none.
