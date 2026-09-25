@@ -40,10 +40,11 @@ export default function DataPage() {
         fail("Nothing to back up yet — no entries are saved on this device.");
         return;
       }
-      downloadFile(backupFilename(), backupToJson(entries), "application/json");
+      const saved = await downloadFile(backupFilename(), backupToJson(entries), "application/json");
+      if (!saved) { say("Export canceled. Your entries are still on this device."); return; }
       say(`Backup exported: ${entries.length} ${entries.length === 1 ? "entry" : "entries"}.`);
     } catch {
-      fail("Couldn't read the entries on this device.");
+      fail("Couldn't export the backup. Your entries are still on this device.");
     }
   };
 
@@ -156,6 +157,32 @@ export default function DataPage() {
             If you are working with a therapist, exports are made to be shared with
             them. No analytics, no tracking, no network access.
           </p>
+          <details className="mt-4 text-[0.8125rem] leading-relaxed text-ink-soft">
+            <summary className="cursor-pointer py-2 font-medium text-ink">Privacy policy</summary>
+            <div className="mt-2 space-y-3">
+              <p>
+                Thought Record collects and shares no personal data. There is no
+                account, server, analytics, tracking, advertising, or crash-reporting
+                service. The developer does not receive your writing or device information.
+              </p>
+              <p>
+                Drafts and saved entries live in this app&apos;s storage on your device.
+                You can delete entries individually or clear all entries and drafts
+                using the controls above. Removing the app or losing the device may
+                permanently erase that writing. Export regularly to keep a copy.
+              </p>
+              <p>
+                Exports are files you choose to create and control. If you later share
+                a file or place it in a synced folder, that destination&apos;s policies
+                apply. The app does not automatically upload or share exports.
+              </p>
+              <p>
+                No data is collected from anyone, including children. If this policy
+                changes in a future version, the change will be explained before
+                any data is sent. Privacy questions: support@urbanpyx.com.
+              </p>
+            </div>
+          </details>
         </section>
       </main>
     </div>

@@ -22,6 +22,14 @@ path for content to leave the device. The user-facing policy is
    should be exported regularly — the app is a working tool, not long-term
    storage, and not a medical device.
 
+## Android enforcement
+
+The release manifest has no Internet permission. Android cloud backup and
+device transfer exclude all storage domains; legacy backup is disabled.
+The local export plugin writes only to a URI explicitly selected in Android's
+file picker, with `EXTRA_LOCAL_ONLY` and no broad storage permission. A canceled
+picker does not count as a completed export.
+
 ## Boundaries
 
 - Local storage is device-local, not a backup. Export exists so "local-only"

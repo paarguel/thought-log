@@ -14,9 +14,13 @@
     "ios:release": "bash scripts/ios-release.sh",
     "ios:archive": "bash scripts/ios-archive.sh",
     "ios:upload": "bash scripts/ios-upload.sh",
-    "ios:testflight": "bash scripts/ios-testflight.sh"
+    "ios:testflight": "bash scripts/ios-testflight.sh",
+    "android:sync": "npm run build && npx cap sync android",
+    "android:open": "npx cap open android",
+    "android:release": "bash scripts/android-release.sh"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.1",
     "@capacitor/cli": "^8.4.1",
     "@capacitor/core": "^8.4.1",
     "@capacitor/ios": "^8.4.1",

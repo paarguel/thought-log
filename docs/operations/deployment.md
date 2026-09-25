@@ -9,11 +9,17 @@
   (`ios/`) and served from disk inside the app — fully offline. See the
   `ios:*` npm scripts and [docs/app-store/](../app-store/).
 
+- **Android:** the same static export is bundled in `android/`. Internet
+  permission is removed; cloud backup and device transfer are disabled.
+  Exports use the system local document picker. See [Google Play](../google-play/release-checklist.md).
+
 ## Environment
 
 None. The app has no configuration and no secrets.
 
-The only machine-local file is the iOS signing config
+Native release credentials are machine-local. Android signing uses
+`~/.thinking-errors-notepad/android-signing.properties` and its upload keystore.
+The iOS signing config is
 (`~/.thinking-errors-notepad/ios-release.env`, App Store Connect API key),
 which never enters the repo.
 

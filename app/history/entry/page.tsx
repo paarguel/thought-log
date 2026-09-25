@@ -66,6 +66,12 @@ function EntryDetail() {
     setLoaded(next);
   };
 
+  const exportEntry = async (filename: string, content: string, mime: string) => {
+    setError(null);
+    try { await downloadFile(filename, content, mime); }
+    catch { setError("Couldn't export the file. Your entry is still on this device."); }
+  };
+
   const remove = async () => {
     try {
       await deleteLocalEntry(id);
@@ -134,7 +140,7 @@ function EntryDetail() {
           <div className="mt-2 flex flex-wrap gap-2">
             <SecondaryButton
               onClick={() =>
-                downloadFile(
+                exportEntry(
                   exportFilename(entry, "html"),
                   worksheetToPrintableHtml(entry, { includeNotes: false }),
                   "text/html"
@@ -146,7 +152,7 @@ function EntryDetail() {
             {entry.notes && (
               <SecondaryButton
                 onClick={() =>
-                  downloadFile(
+                  exportEntry(
                     exportFilename(entry, "html"),
                     worksheetToPrintableHtml(entry, { includeNotes: true }),
                     "text/html"
@@ -158,7 +164,7 @@ function EntryDetail() {
             )}
             <SecondaryButton
               onClick={() =>
-                downloadFile(exportFilename(entry, "json"), worksheetToJson(entry), "application/json")
+                exportEntry(exportFilename(entry, "json"), worksheetToJson(entry), "application/json")
               }
             >
               Export JSON
