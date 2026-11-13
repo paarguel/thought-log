@@ -1,16 +1,74 @@
 # Thought Record
 
-A private, mobile-first notepad for thinking errors. Write out what's in your
-head, circle the thoughts — like on a paper CBT worksheet — name the thinking
-patterns (cognitive distortions), and land on a more balanced thought.
+**A private CBT thought-record worksheet for your phone. Nothing you write ever leaves the device.**
 
-Free and open source. **Everything stays on your device**: no account, no
-cloud, no server, no analytics, no AI. The app never makes a network request.
+[App Store](https://apps.apple.com/us/app/thought-record-cbt-notes/id6788916753) · [Google Play](https://play.google.com/store/apps/details?id=com.urbanpyx.thinkingerrors) · [Privacy policy](PRIVACY.md) · MIT licensed
 
-> **Your data, honestly:** entries live only on the device. If the app is
-> deleted or the device is lost, they're gone. Export regularly — this is a
-> working notepad, not long-term storage. It's a self-help writing tool, not
-> therapy or a medical device.
+| | |
+| --- | --- |
+| **Problem** | Cognitive behavioral therapy (CBT) asks people to write out a stressful moment, circle the distorted thoughts, and reason toward a balanced one. Paper is good at this and phones are bad at it: most apps want an account, upload your most private writing to a server, or have an AI interpret it for you. |
+| **Approach** | Copy the paper worksheet instead of reinventing it. One clear action per screen, no AI reading into your words, and a hard privacy line: no account, no server, no analytics, and no network requests at all. |
+| **What it is** | A free, open-source app on iOS, Android and the web. It is one Next.js codebase exported as a static site and wrapped with Capacitor, so all three work fully offline. |
+| **Status** | Live on the App Store and Google Play. |
+
+<p>
+  <img src="docs/app-store/screenshots/01-first-launch.png" width="180" alt="First launch: the situation step">
+  <img src="docs/app-store/screenshots/02-label-thoughts.png" width="180" alt="Labeling a circled thought with a thinking pattern">
+  <img src="docs/app-store/screenshots/03-review.png" width="180" alt="Reviewing the whole worksheet">
+  <img src="docs/app-store/screenshots/05-your-data.png" width="180" alt="Exporting and backing up entries">
+</p>
+
+## The problem
+
+A CBT thought record is a simple exercise: describe the situation, name what
+you felt, write out the thoughts in your head, spot the thinking errors
+(cognitive distortions such as catastrophizing or mind reading), and finish
+with a more balanced thought. On paper you write freely, circle phrases and
+see the whole page at once. Digital versions tend to go wrong in one of three
+ways. Some turn into clinical forms. Some chop your thoughts into fields
+before you've finished thinking them. Some send the text to a server or a
+model that interprets it for you. People write some of the most sensitive
+things they will ever type in an app like this, so I treated privacy as a
+product requirement, not a setting.
+
+## How I approached it
+
+- **Start from the paper worksheet.** You write one long passage first, then
+  highlight phrases to "circle" them, then label each phrase with a thinking
+  pattern, one at a time. A review step shows the original text, everything
+  together, or one thought at a time. The first screen is the worksheet
+  itself, with no landing page in the way.
+- **Cut scope to earn trust.** The first plan included optional cloud
+  history (Supabase auth and Postgres). I removed it before launch. With no
+  server, there is no breach risk, no account to recover and no data policy
+  to trust. The trade-off is stated plainly in the app: export your entries,
+  because a lost device takes them with it.
+- **Make "no network" provable, not promised.** The Android manifest drops
+  the Internet permission entirely and excludes app data from cloud backup.
+  The iOS and web builds make no requests. The privacy policy can say "we
+  collect nothing" because the app has no way to.
+- **Deterministic, not AI.** An optional "auto choose thoughts" helper
+  splits on grammar and punctuation. It never interprets meaning, and it
+  warns before replacing your own selections.
+- **One codebase, three stores' worth of polish.** The same static export
+  ships to the web, iOS (Capacitor) and Android. Release scripts handle
+  signing, TestFlight upload and Play bundles, and the store listings and
+  release checklists are versioned in `docs/`.
+
+## What I built
+
+- A guided worksheet: situation → feelings → thoughts → circle phrases →
+  label thinking patterns → review → balanced thought.
+- History, entry notes, and printable or JSON export. A "Your data" page
+  backs up and restores every entry as one file.
+- Drafts that autosave on the device, so nothing is lost mid-worksheet.
+- Unit and flow tests (Vitest and Testing Library) for the reducer, phrase
+  segmenter, feelings model, export and the worksheet flow.
+
+**Stack:** Next.js (static export), React, TypeScript, Tailwind CSS,
+IndexedDB, Capacitor (iOS and Android), Vitest.
+
+---
 
 ## How your data is stored
 
@@ -26,7 +84,7 @@ page can export every entry as one backup file and import it again later.
 
 See [PRIVACY.md](PRIVACY.md) for the full posture.
 
-## Develop
+## Run it locally
 
 ```bash
 npm install
@@ -95,11 +153,10 @@ picker and do not need broad storage access.
 The signed Android release passed API 36 emulator testing on September 24,
 2026, including offline persistence and backup/printable exports. Google Play has
 accepted the bundle and published the internal release, with no testers selected.
-The production release and store listing were submitted September 24, 2026;
-Play Console shows **Changes in review**; automated quick checks have finished.
-Intended audience is 13+, with no data collected or
-shared. Approved changes will publish automatically in the selected 177
-countries/regions. Public availability has not yet been verified.
+The production release and store listing were submitted September 24, 2026,
+and the app is publicly listed on Google Play (checked November 13, 2026).
+Intended audience is 13+, with no data collected or shared, in 177
+countries/regions.
 
 ## License
 
