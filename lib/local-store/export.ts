@@ -16,7 +16,7 @@ import {
   type EmotionCheckIn,
   type Entry,
 } from "@/lib/check-in/types";
-import { reflectionLines } from "@/lib/check-in/reflection";
+import { REFLECTION_CLOSING } from "@/lib/check-in/reflection";
 
 export const BACKUP_APP_ID = "thought-record";
 
@@ -231,8 +231,8 @@ ${
 }
 
 /**
- * Printable copy of a check-in: the reflection first, then exactly what was
- * picked and typed. Notes follow the same under-share default as worksheets.
+ * Printable copy of a check-in: exactly what was picked and typed, section
+ * by section, then the closing line. Notes follow the same under-share default as worksheets.
  */
 export function checkInToPrintableHtml(
   c: EmotionCheckIn,
@@ -255,20 +255,13 @@ export function checkInToPrintableHtml(
   h1 { font-size: 1.4rem; border-bottom: 1px solid #d8cfc0; padding-bottom: .5rem; }
   h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: #8a8072; margin: 1.6rem 0 .4rem; }
   .meta { color: #8a8072; font-size: .85rem; }
-  .reflection { background: #f1ece2; border-radius: .5rem; padding: 1rem; }
-  .reflection p { margin: 0 0 .35rem; }
+  .closing { margin-top: 2rem; font-style: italic; color: #6f6759; }
   @media print { body { background: #fff; margin: 0 auto; } }
 </style>
 </head>
 <body>
 <h1>${escapeHtml(checkInTitle(c))}</h1>
 <p class="meta">${escapeHtml(formatDate(c.createdAt))} — Emotion check-in, Thought Record</p>
-
-<div class="reflection">
-${reflectionLines(c)
-  .map((line) => `<p>${escapeHtml(line)}</p>`)
-  .join("\n")}
-</div>
 
 ${row("What happened", escapeHtml(c.situation.trim()).replace(/\n/g, "<br/>"))}${row(
     "What I might be feeling",
@@ -280,7 +273,8 @@ ${row("What happened", escapeHtml(c.situation.trim()).replace(/\n/g, "<br/>"))}$
     includeNotes && c.notes?.trim()
       ? row("Notes", escapeHtml(c.notes).replace(/\n/g, "<br/>"))
       : ""
-  }</body>
+  }<p class="closing">${escapeHtml(REFLECTION_CLOSING)}</p>
+</body>
 </html>`;
 }
 

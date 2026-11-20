@@ -1,9 +1,10 @@
 "use client";
 
 /**
- * Reopen a saved check-in to change it (`/check-in?id=`). Saving writes back
- * to the same entry, keeping its original date. Without an id this is just a
- * new check-in.
+ * Reopen a saved check-in to change it (`/check-in?id=`), optionally straight
+ * onto one section (`&section=feeling`). Saving writes back to the same
+ * entry, keeping its original date. Without an id this is just a new
+ * check-in.
  *
  * The id rides in the query string, like the entry page, so the app stays a
  * static export.
@@ -13,14 +14,19 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { isCheckIn, type EmotionCheckIn } from "@/lib/check-in/types";
+import type { CheckInSection } from "@/lib/check-in/reflection";
 import { getLocalEntry } from "@/lib/local-store/indexed-db";
 import { TopBar } from "@/components/app/top-bar";
 import { CheckInFlow } from "@/components/check-in/check-in-flow";
+
+const SECTIONS: CheckInSection[] = ["happened", "feeling", "body", "need"];
 
 function CheckInEditor() {
   const search = useSearchParams();
   const router = useRouter();
   const id = search.get("id") ?? "";
+  const sectionParam = search.get("section");
+  const section = SECTIONS.find((s) => s === sectionParam);
   const [loaded, setLoaded] = useState<EmotionCheckIn | null | undefined>(undefined);
 
   useEffect(() => {
@@ -49,6 +55,7 @@ function CheckInEditor() {
   return (
     <CheckInFlow
       editing={loaded}
+      editSection={section}
       onSaved={() => router.push(entryUrl)}
       onCancel={() => router.push(entryUrl)}
     />

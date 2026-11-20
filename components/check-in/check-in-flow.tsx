@@ -25,7 +25,7 @@ import {
   toggleItem,
   type EmotionCheckIn,
 } from "@/lib/check-in/types";
-import { reflectionLines, reflectionText } from "@/lib/check-in/reflection";
+import { reflectionText, type CheckInSection } from "@/lib/check-in/reflection";
 import { copyText } from "@/lib/check-in/copy";
 import {
   clearCheckInDraft,
@@ -36,8 +36,9 @@ import {
 import { dataNoticeAcknowledged } from "@/components/app/data-notice";
 import { Chip, GhostButton, PrimaryButton, SecondaryButton } from "@/components/ui/buttons";
 import { StepFooter, StepHeader } from "@/components/worksheet/step-chrome";
+import { CheckInSummary } from "./check-in-summary";
 
-type Step = "happened" | "feeling" | "body" | "need" | "reflection";
+type Step = CheckInSection | "reflection";
 const STEPS: Step[] = ["happened", "feeling", "body", "need", "reflection"];
 
 /** A draft older than this is a different moment; it is dropped, not resumed. */
@@ -45,20 +46,6 @@ const DRAFT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 export const CLOSING_REMINDER =
   "Noticing is enough. You don't need to solve what you're feeling right now.";
-
-function Reflection({ checkIn }: { checkIn: EmotionCheckIn }) {
-  return (
-    <div className="rounded-xl border border-line bg-paper-raised px-4 py-4">
-      {reflectionLines(checkIn).map((line, i) => (
-        <p key={i} className="font-display text-[1.125rem] leading-relaxed text-ink [&+p]:mt-1.5">
-          {line}
-        </p>
-      ))}
-    </div>
-  );
-}
-
-export { Reflection as CheckInReflection };
 
 function Intensity({
   value,
@@ -111,6 +98,7 @@ function Intensity({
 
 export function CheckInFlow({
   editing,
+  editSection,
   kindSwitch,
   seedSituation,
   onSeedUsed,
@@ -121,6 +109,8 @@ export function CheckInFlow({
 }: {
   /** A saved check-in being reopened. Saving writes back to the same entry. */
   editing?: EmotionCheckIn;
+  /** With `editing`: open straight onto one section and save from there. */
+  editSection?: CheckInSection;
   /** Render the thought/feeling switch above the first question. */
   kindSwitch?: (leave: () => void) => ReactNode;
   /** Situation text carried over from the thought flow. */
@@ -135,7 +125,15 @@ export function CheckInFlow({
   onCancel?: () => void;
 }) {
   const [checkIn, setCheckIn] = useState<EmotionCheckIn>(() => editing ?? newCheckIn());
-  const [step, setStep] = useState<Step>(editing ? "reflection" : "happened");
+  const [step, setStep] = useState<Step>(
+    editing ? (editSection ?? "reflection") : "happened"
+  );
+  // Reopening one section is a detour, not a second pass through the flow:
+  //  - "review": opened from the pencil on the summary; Done goes back to it.
+  //  - "save": a saved entry opened on one section; the button saves it.
+  const [detour, setDetour] = useState<"none" | "review" | "save">(
+    editing && editSection ? "save" : "none"
+  );
   const [ready, setReady] = useState(Boolean(editing));
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [copied, setCopied] = useState<"no" | "yes" | "failed">("no");
@@ -202,6 +200,26 @@ export function CheckInFlow({
   const back = () => go(STEPS[Math.max(STEPS.indexOf(step) - 1, 0)]);
   const position = { index: STEPS.indexOf(step), total: STEPS.length };
 
+  /** Footer for a question step: the normal walk-through, or a detour's way out. */
+  const footer = (answered: boolean, first = false) =>
+    detour === "save" ? (
+      <StepFooter onNext={save} nextLabel="Save changes" onBack={onCancel} />
+    ) : detour === "review" ? (
+      <StepFooter
+        onNext={() => {
+          setDetour("none");
+          go("reflection");
+        }}
+        nextLabel="Done"
+      />
+    ) : (
+      <StepFooter
+        onNext={next}
+        nextLabel={answered ? "Continue" : "Skip"}
+        onBack={first ? undefined : back}
+      />
+    );
+
   const leave = () => {
     const onlySituation =
       checkIn.emotions.length === 0 &&
@@ -226,6 +244,9 @@ export function CheckInFlow({
       await clearCheckInDraft();
       setStatus("saved");
     } catch {
+      // The message lives on the summary screen.
+      setDetour("none");
+      setStep("reflection");
       setStatus("error");
     }
   };
@@ -276,7 +297,7 @@ export function CheckInFlow({
   if (step === "happened") {
     return (
       <section className="step-enter flex flex-1 flex-col" aria-label="What happened">
-        {kindSwitch?.(leave)}
+        {detour === "none" && kindSwitch?.(leave)}
         <StepHeader
           position={position}
           title="What happened?"
@@ -290,11 +311,7 @@ export function CheckInFlow({
           aria-label="Describe what happened"
           autoFocus={dataNoticeAcknowledged()}
         />
-        <StepFooter
-          onNext={next}
-          nextLabel={checkIn.situation.trim() ? "Continue" : "Skip"}
-          onBack={editing ? () => go("reflection") : undefined}
-        />
+        {footer(Boolean(checkIn.situation.trim()), true)}
       </section>
     );
   }
@@ -374,11 +391,7 @@ export function CheckInFlow({
           </div>
           <Intensity value={checkIn.intensity} onChange={(intensity) => update({ intensity })} />
         </div>
-        <StepFooter
-          onNext={next}
-          nextLabel={checkIn.emotions.length > 0 ? "Continue" : "Skip"}
-          onBack={back}
-        />
+        {footer(checkIn.emotions.length > 0)}
       </section>
     );
   }
@@ -427,16 +440,12 @@ export function CheckInFlow({
           onChange={(e) => setText(e.target.value)}
           placeholder={
             body
-              ? "Tight shoulders, heavy chest, restlessness, fatigue, wanting to withdraw, crying, feeling calm, or nothing noticeable."
-              : "Rest, connection, support, space, understanding, affection, encouragement, or maybe I'm not sure."
+              ? "Anything else you notice that isn't listed, in your own words."
+              : "Anything else you might need that isn't listed."
           }
           aria-label={body ? "In your own words, what you notice" : "In your own words, what you might need"}
         />
-        <StepFooter
-          onNext={next}
-          nextLabel={picked.length > 0 || text.trim() ? "Continue" : "Skip"}
-          onBack={back}
-        />
+        {footer(picked.length > 0 || Boolean(text.trim()))}
       </section>
     );
   }
@@ -445,10 +454,16 @@ export function CheckInFlow({
   return (
     <section className="step-enter flex flex-1 flex-col" aria-label="Reflection">
       <StepHeader position={position} title="Noticing is enough." hint="You don't need to solve what you're feeling right now." />
-      <Reflection checkIn={checkIn} />
+      <CheckInSummary
+        checkIn={checkIn}
+        showBlank
+        onEdit={(section) => {
+          setDetour("review");
+          go(section);
+        }}
+      />
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <SecondaryButton onClick={copy}>Copy reflection</SecondaryButton>
-        <SecondaryButton onClick={() => go("happened")}>Edit check-in</SecondaryButton>
         <span role="status" className="text-[0.875rem] text-ink-faint">
           {copied === "yes" ? "Copied." : copied === "failed" ? "Couldn't copy on this device." : ""}
         </span>

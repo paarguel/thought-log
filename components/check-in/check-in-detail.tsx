@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * A saved check-in, read back: the reflection first, then exactly what was
- * picked and typed. Skipped questions are simply absent.
+ * A saved check-in, read back section by section. Skipped questions are
+ * simply absent; each answered one has a pencil that reopens just it.
  */
 
 import { useState } from "react";
@@ -11,25 +11,11 @@ import type { EmotionCheckIn } from "@/lib/check-in/types";
 import { reflectionText } from "@/lib/check-in/reflection";
 import { copyText } from "@/lib/check-in/copy";
 import { SecondaryButton } from "@/components/ui/buttons";
-import { CheckInReflection } from "./check-in-flow";
-
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <section className="mb-5">
-      <h2 className="mb-1 text-[0.8125rem] text-ink-faint">{label}</h2>
-      <div className="text-[1rem] text-ink">{children}</div>
-    </section>
-  );
-}
-
-function joined(picked: string[], typed: string): string {
-  return [...picked, typed.trim()].filter(Boolean).join(" · ");
-}
+import { CheckInSummary } from "./check-in-summary";
 
 export function CheckInDetail({ checkIn }: { checkIn: EmotionCheckIn }) {
   const [copied, setCopied] = useState<"no" | "yes" | "failed">("no");
-  const sensations = joined(checkIn.sensations, checkIn.sensationText);
-  const needs = joined(checkIn.needs, checkIn.needText);
+  const editUrl = `/check-in?id=${encodeURIComponent(checkIn.id)}`;
   const edited = checkIn.updatedAt.slice(0, 16) !== checkIn.createdAt.slice(0, 16);
 
   return (
@@ -40,7 +26,7 @@ export function CheckInDetail({ checkIn }: { checkIn: EmotionCheckIn }) {
             dateStyle: "long",
             timeStyle: "short",
           })}{" "}
-          · Check-in
+          · Feeling check-in
           {edited &&
             ` · Edited ${new Date(checkIn.updatedAt).toLocaleDateString(undefined, {
               month: "short",
@@ -49,11 +35,14 @@ export function CheckInDetail({ checkIn }: { checkIn: EmotionCheckIn }) {
         </p>
       </div>
 
-      <CheckInReflection checkIn={checkIn} />
+      <CheckInSummary
+        checkIn={checkIn}
+        editHref={(section) => `${editUrl}&section=${section}`}
+      />
 
       <div className="mt-3 mb-7 flex flex-wrap items-center gap-2">
         <Link
-          href={`/check-in?id=${encodeURIComponent(checkIn.id)}`}
+          href={editUrl}
           className="flex min-h-11 items-center rounded-full border border-line-strong bg-paper-raised px-5 text-[0.9375rem] font-medium text-ink-soft active:bg-paper-sunken"
         >
           Edit check-in
@@ -70,31 +59,6 @@ export function CheckInDetail({ checkIn }: { checkIn: EmotionCheckIn }) {
         </span>
       </div>
 
-      {checkIn.situation.trim() && (
-        <Row label="What happened">
-          <p className="whitespace-pre-wrap">{checkIn.situation}</p>
-        </Row>
-      )}
-      {checkIn.emotions.length > 0 && (
-        <Row label="What I might be feeling">
-          <p>{checkIn.emotions.join(" · ")}</p>
-        </Row>
-      )}
-      {checkIn.intensity !== undefined && (
-        <Row label="How strong it felt">
-          <p>{checkIn.intensity} of 10</p>
-        </Row>
-      )}
-      {sensations && (
-        <Row label="What I notice in my body or behavior">
-          <p className="whitespace-pre-wrap">{sensations}</p>
-        </Row>
-      )}
-      {needs && (
-        <Row label="What I might need">
-          <p className="whitespace-pre-wrap">{needs}</p>
-        </Row>
-      )}
     </>
   );
 }

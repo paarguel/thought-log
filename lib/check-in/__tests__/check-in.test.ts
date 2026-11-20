@@ -7,7 +7,7 @@ import {
   newCheckIn,
   toggleEmotion,
 } from "../types";
-import { reflectionLines, reflectionText, REFLECTION_CLOSING } from "../reflection";
+import { reflectionRows, reflectionText, REFLECTION_CLOSING, rowIsBlank } from "../reflection";
 import { newWorksheet } from "@/lib/thought-log/types";
 
 describe("toggleEmotion", () => {
@@ -32,51 +32,47 @@ describe("isCheckIn", () => {
 });
 
 describe("reflection", () => {
-  it("reads a full check-in back in plain sentences", () => {
+  it("reads a full check-in back as four labeled sections", () => {
     const c = newCheckIn("c");
     c.situation = "I opened my work laptop";
     c.emotions = ["Anxious", "Overwhelmed"];
-    c.sensations = ["Tight shoulders", "Restlessness"];
+    c.intensity = 7;
+    c.sensations = ["Tight shoulders"];
     c.sensationText = "My jaw is clenched.";
-    c.needs = ["Rest", "Space"];
-    expect(reflectionLines(c)).toEqual([
-      "Something happened: I opened my work laptop.",
-      "I might be feeling anxious and overwhelmed.",
-      "I notice tight shoulders, restlessness and my jaw is clenched.",
-      "I might need rest and space.",
-      REFLECTION_CLOSING,
+    c.needs = ["Rest", "Not sure"];
+    expect(reflectionRows(c).map((r) => r.label)).toEqual([
+      "What happened",
+      "I might be feeling",
+      "I notice",
+      "I might need",
     ]);
+    expect(reflectionText(c)).toBe(
+      [
+        "What happened: I opened my work laptop",
+        "I might be feeling: Anxious, Overwhelmed, Strength 7 of 10",
+        "I notice: Tight shoulders, My jaw is clenched.",
+        "I might need: Rest, Not sure",
+        "",
+        REFLECTION_CLOSING,
+      ].join("\n")
+    );
   });
 
-  it("leaves out whatever was skipped", () => {
+  it("leaves skipped sections out of the copied text, word for word otherwise", () => {
     const c = newCheckIn("c");
     c.emotions = ["Unsure"];
-    expect(reflectionLines(c)).toEqual(["I might be feeling unsure.", REFLECTION_CLOSING]);
+    expect(reflectionText(c)).toBe(`I might be feeling: Unsure\n\n${REFLECTION_CLOSING}`);
+    expect(reflectionRows(c).filter(rowIsBlank).map((r) => r.section)).toEqual([
+      "happened",
+      "body",
+      "need",
+    ]);
   });
 
   it("treats an empty check-in as a complete one", () => {
     const c = newCheckIn("c");
     expect(checkInHasContent(c)).toBe(false);
-    expect(reflectionText(c)).toBe(`I stopped to notice.\n${REFLECTION_CLOSING}`);
+    expect(reflectionText(c)).toBe(REFLECTION_CLOSING);
     expect(checkInTitle(c)).toBe("Check-in");
-  });
-
-  it("lets 'Not sure' stand as an answer about needs", () => {
-    const c = newCheckIn("c");
-    c.needs = ["Not sure"];
-    expect(reflectionLines(c)[0]).toBe("I'm not sure what I need.");
-    c.needs = ["Rest", "Not sure"];
-    expect(reflectionLines(c)[0]).toBe("I might need rest, though I'm not sure.");
-  });
-
-  it("keeps 'I' and existing punctuation as typed", () => {
-    const c = newCheckIn("c");
-    c.situation = "Why did that bother me?";
-    c.needText = "I want a quiet evening";
-    expect(reflectionLines(c)).toEqual([
-      "Something happened: Why did that bother me?",
-      "I might need I want a quiet evening.",
-      REFLECTION_CLOSING,
-    ]);
   });
 });

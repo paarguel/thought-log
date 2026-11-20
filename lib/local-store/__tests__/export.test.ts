@@ -147,7 +147,8 @@ describe("check-ins in export and backup", () => {
     const html = checkInToPrintableHtml(sampleCheckIn());
     expect(html).not.toContain("<script>alert(1)</script>");
     expect(html).not.toContain("<b>Tired</b>");
-    expect(html).toContain("I might be feeling overwhelmed");
+    expect(html).toContain("Overwhelmed");
+    expect(html).toContain("I don&#39;t have to figure this out perfectly.");
     expect(html).toContain("6 of 10");
     expect(html).not.toContain("private note");
     expect(checkInToPrintableHtml(sampleCheckIn(), { includeNotes: true })).toContain(

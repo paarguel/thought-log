@@ -8,6 +8,7 @@ import {
   clearAllLocalData,
   listLocalEntries,
   loadDraft,
+  saveDraft,
   saveLocalEntry,
 } from "@/lib/local-store/indexed-db";
 import { newWorksheet } from "@/lib/thought-log/types";
@@ -46,6 +47,23 @@ describe("first screen", () => {
   });
 });
 
+describe("unfinished thought", () => {
+  it("does not stand between the user and a feeling, and is left as it was", async () => {
+    const draft = newWorksheet("draft-1");
+    draft.situation = "Half-written thought";
+    draft.thoughtText = "something further along";
+    await saveDraft(draft);
+
+    const user = userEvent.setup();
+    render(<Capture />);
+    expect(await screen.findByText("You have an unfinished entry.")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "A feeling" }));
+
+    expect(await screen.findByLabelText("Describe what happened")).toHaveValue("");
+    expect((await loadDraft())?.thoughtText).toBe("something further along");
+  });
+});
+
 describe("CheckInFlow", () => {
   it("saves a check-in with nothing answered", async () => {
     const user = userEvent.setup();
@@ -53,7 +71,8 @@ describe("CheckInFlow", () => {
     for (let i = 0; i < 4; i++) {
       await user.click(await screen.findByRole("button", { name: "Skip" }));
     }
-    expect(await screen.findByText("I stopped to notice.")).toBeInTheDocument();
+    expect(await screen.findByText("Noticing is enough.")).toBeInTheDocument();
+    expect(screen.getAllByText("Left blank")).toHaveLength(4);
     await user.click(screen.getByRole("button", { name: "Save to Thought Record" }));
     expect(await screen.findByText("Saved.")).toBeInTheDocument();
     expect(await savedCheckIns()).toHaveLength(1);
@@ -79,9 +98,8 @@ describe("CheckInFlow", () => {
     await user.click(await screen.findByRole("button", { name: "Rest" }));
     await user.click(screen.getByRole("button", { name: "Continue" }));
 
-    expect(
-      await screen.findByText("I might be feeling anxious, unsure and numb.")
-    ).toBeInTheDocument();
+    const summary = (await screen.findByText("I might be feeling")).closest("section")!;
+    expect(summary).toHaveTextContent("AnxiousUnsureNumb");
     await user.click(screen.getByRole("button", { name: "Save to Thought Record" }));
     await screen.findByText("Saved.");
 
@@ -108,14 +126,10 @@ describe("CheckInFlow", () => {
     const user = userEvent.setup();
     render(<CheckInFlow editing={original} onSaved={onSaved} />);
 
-    expect(await screen.findByText("I might be feeling sad.")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Edit check-in" }));
-    await user.click(await screen.findByRole("button", { name: "Skip" }));
+    // The pencil reopens just that section, and Done comes straight back.
+    await user.click(await screen.findByRole("button", { name: "Edit: I might be feeling" }));
     await user.click(await screen.findByRole("button", { name: "Relieved" }));
-    for (const _ of [0, 1, 2]) {
-      void _;
-      await user.click(screen.getByRole("button", { name: /Continue|Skip/ }));
-    }
+    await user.click(screen.getByRole("button", { name: "Done" }));
     await user.click(await screen.findByRole("button", { name: "Save changes" }));
 
     expect(onSaved).toHaveBeenCalled();
@@ -125,5 +139,22 @@ describe("CheckInFlow", () => {
     expect(saved.emotions).toEqual(["Sad", "Relieved"]);
     expect(saved.createdAt).toBe("2026-11-01T09:00:00.000Z");
     expect(saved.updatedAt > saved.createdAt).toBe(true);
+  });
+
+  it("opens a saved check-in on one section and saves from there", async () => {
+    const original = newCheckIn("saved-2");
+    original.needs = ["Rest"];
+    await saveLocalEntry(original);
+
+    const onSaved = vi.fn();
+    const user = userEvent.setup();
+    render(<CheckInFlow editing={original} editSection="need" onSaved={onSaved} />);
+
+    await user.click(await screen.findByRole("button", { name: "Space" }));
+    await user.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await vi.waitFor(() => expect(onSaved).toHaveBeenCalled());
+    const [saved] = await savedCheckIns();
+    expect(saved.needs).toEqual(["Rest", "Space"]);
   });
 });

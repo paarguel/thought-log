@@ -120,7 +120,10 @@ export function WorksheetFlow({
   if (phase.kind === "resume-prompt") {
     const draft = phase.draft;
     return (
-      <div className="step-enter flex flex-1 flex-col justify-center px-1">
+      <div className="step-enter flex flex-1 flex-col">
+        {/* An unfinished thought shouldn't stand between you and a feeling. */}
+        {kindSwitch?.(() => onLeave?.(""))}
+        <div className="flex flex-1 flex-col justify-center px-1">
         <p className="font-display text-[1.5rem] leading-snug text-ink">
           You have an unfinished entry.
         </p>
@@ -150,6 +153,7 @@ export function WorksheetFlow({
             </GhostButton>
           </div>
         </div>
+      </div>
       </div>
     );
   }
