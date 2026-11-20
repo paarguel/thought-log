@@ -10,6 +10,13 @@ import { Capacitor, registerPlugin } from "@capacitor/core";
 import type { Worksheet } from "@/lib/thought-log/types";
 import { worksheetTitle, WORKSHEET_SCHEMA_VERSION } from "@/lib/thought-log/types";
 import { getDistortion } from "@/lib/thought-log/distortions";
+import {
+  checkInTitle,
+  isCheckIn,
+  type EmotionCheckIn,
+  type Entry,
+} from "@/lib/check-in/types";
+import { reflectionLines } from "@/lib/check-in/reflection";
 
 export const BACKUP_APP_ID = "thought-record";
 
@@ -22,15 +29,15 @@ export function escapeHtml(text: string): string {
     .replace(/'/g, "&#39;");
 }
 
-export function worksheetToJson(w: Worksheet): string {
-  return JSON.stringify(w, null, 2);
+export function worksheetToJson(entry: Entry): string {
+  return JSON.stringify(entry, null, 2);
 }
 
 /**
  * Full-device backup: every saved entry in one portable JSON file.
  * This is the user's safety net — the app itself is not long-term storage.
  */
-export function backupToJson(entries: Worksheet[]): string {
+export function backupToJson(entries: Entry[]): string {
   return JSON.stringify(
     {
       app: BACKUP_APP_ID,
@@ -61,11 +68,37 @@ function isWorksheetLike(value: unknown): value is Worksheet {
   );
 }
 
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((v) => typeof v === "string");
+}
+
+function isCheckInLike(value: unknown): value is EmotionCheckIn {
+  if (typeof value !== "object" || value === null) return false;
+  const c = value as Record<string, unknown>;
+  return (
+    c.kind === "check-in" &&
+    typeof c.id === "string" &&
+    typeof c.createdAt === "string" &&
+    typeof c.updatedAt === "string" &&
+    typeof c.situation === "string" &&
+    typeof c.sensationText === "string" &&
+    typeof c.needText === "string" &&
+    isStringArray(c.emotions) &&
+    isStringArray(c.sensations) &&
+    isStringArray(c.needs) &&
+    (c.intensity === undefined || typeof c.intensity === "number")
+  );
+}
+
+function isEntryLike(value: unknown): value is Entry {
+  return isCheckInLike(value) || isWorksheetLike(value);
+}
+
 /**
- * Parse a backup file (or a single exported entry) back into worksheets.
+ * Parse a backup file (or a single exported entry) back into entries.
  * Throws a user-facing Error when the file isn't one of ours.
  */
-export function parseBackupJson(text: string): Worksheet[] {
+export function parseBackupJson(text: string): Entry[] {
   let data: unknown;
   try {
     data = JSON.parse(text);
@@ -74,10 +107,10 @@ export function parseBackupJson(text: string): Worksheet[] {
   }
 
   // A single exported entry is also importable.
-  if (isWorksheetLike(data)) return [data];
+  if (isEntryLike(data)) return [data];
 
   if (typeof data === "object" && data !== null && Array.isArray((data as { entries?: unknown }).entries)) {
-    const entries = (data as { entries: unknown[] }).entries.filter(isWorksheetLike);
+    const entries = (data as { entries: unknown[] }).entries.filter(isEntryLike);
     if (entries.length === 0) {
       throw new Error("That backup file doesn't contain any entries.");
     }
@@ -197,6 +230,70 @@ ${
 </html>`;
 }
 
+/**
+ * Printable copy of a check-in: the reflection first, then exactly what was
+ * picked and typed. Notes follow the same under-share default as worksheets.
+ */
+export function checkInToPrintableHtml(
+  c: EmotionCheckIn,
+  { includeNotes = false }: { includeNotes?: boolean } = {}
+): string {
+  const list = (picked: string[], typed: string) =>
+    [...picked, typed.trim()].filter(Boolean).map(escapeHtml).join(" · ");
+  const row = (label: string, value: string) =>
+    value ? `<h2>${label}</h2>\n<p>${value}</p>\n` : "";
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>${escapeHtml(checkInTitle(c))} — Thought Record</title>
+<style>
+  body { font-family: Georgia, 'Times New Roman', serif; color: #26221c; background: #faf6f0;
+         max-width: 42rem; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.6; }
+  h1 { font-size: 1.4rem; border-bottom: 1px solid #d8cfc0; padding-bottom: .5rem; }
+  h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: #8a8072; margin: 1.6rem 0 .4rem; }
+  .meta { color: #8a8072; font-size: .85rem; }
+  .reflection { background: #f1ece2; border-radius: .5rem; padding: 1rem; }
+  .reflection p { margin: 0 0 .35rem; }
+  @media print { body { background: #fff; margin: 0 auto; } }
+</style>
+</head>
+<body>
+<h1>${escapeHtml(checkInTitle(c))}</h1>
+<p class="meta">${escapeHtml(formatDate(c.createdAt))} — Emotion check-in, Thought Record</p>
+
+<div class="reflection">
+${reflectionLines(c)
+  .map((line) => `<p>${escapeHtml(line)}</p>`)
+  .join("\n")}
+</div>
+
+${row("What happened", escapeHtml(c.situation.trim()).replace(/\n/g, "<br/>"))}${row(
+    "What I might be feeling",
+    c.emotions.map(escapeHtml).join(" · ")
+  )}${row("How strong it felt", c.intensity ? `${c.intensity} of 10` : "")}${row(
+    "What I notice in my body or behavior",
+    list(c.sensations, c.sensationText)
+  )}${row("What I might need", list(c.needs, c.needText))}${
+    includeNotes && c.notes?.trim()
+      ? row("Notes", escapeHtml(c.notes).replace(/\n/g, "<br/>"))
+      : ""
+  }</body>
+</html>`;
+}
+
+/** Printable HTML for either kind of entry. */
+export function entryToPrintableHtml(
+  entry: Entry,
+  options: { includeNotes?: boolean } = {}
+): string {
+  return isCheckIn(entry)
+    ? checkInToPrintableHtml(entry, options)
+    : worksheetToPrintableHtml(entry, options);
+}
+
 const localExport = registerPlugin<{
   save(options: { filename: string; content: string; mime: string }): Promise<{ saved: boolean }>;
 }>("LocalExport");
@@ -219,13 +316,14 @@ export async function downloadFile(filename: string, content: string, mime: stri
   return true;
 }
 
-export function exportFilename(w: Worksheet, ext: "json" | "html"): string {
-  const date = w.createdAt.slice(0, 10);
+export function exportFilename(entry: Entry, ext: "json" | "html"): string {
+  const date = entry.createdAt.slice(0, 10);
+  const checkIn = isCheckIn(entry);
   const slug =
-    worksheetTitle(w)
+    (checkIn ? checkInTitle(entry) : worksheetTitle(entry))
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .slice(0, 40) || "entry";
-  return `thinking-errors-${date}-${slug}.${ext}`;
+  return `${checkIn ? "check-in" : "thinking-errors"}-${date}-${slug}.${ext}`;
 }

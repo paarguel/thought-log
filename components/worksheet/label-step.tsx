@@ -45,7 +45,7 @@ export function LabelStep({
       <StepHeader
         step="label"
         title="Name the pattern."
-        hint="Does this thought fit any of these thinking traps? Pick any that apply — or none."
+        hint="Does this thought fit any of these thinking traps? Pick any that apply, or none."
       />
 
       <p className="mb-1 text-[0.8125rem] text-ink-faint">

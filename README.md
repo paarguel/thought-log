@@ -59,6 +59,11 @@ product requirement, not a setting.
 
 - A guided worksheet: situation → feelings → thoughts → circle phrases →
   label thinking patterns → review → balanced thought.
+- An emotion check-in, one tap from the first screen: what happened, what
+  the feeling might be, what the body is doing, what might help. Every
+  question can be skipped, nothing is scored or interpreted, and the app
+  reads it back as a few plain sentences. Saved check-ins can be reopened
+  and changed.
 - History, entry notes, and printable or JSON export. A "Your data" page
   backs up and restores every entry as one file.
 - Drafts that autosave on the device, so nothing is lost mid-worksheet.

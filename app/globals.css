@@ -230,6 +230,12 @@ body::before {
   border-radius: 4px 50% 50% 50%;
 }
 
+/* The optional intensity slider: an ink thumb on a paper track. */
+.intensity-range {
+  accent-color: var(--ink);
+  height: 2rem;
+}
+
 /* Gentle step entrance */
 @keyframes step-in {
   from {

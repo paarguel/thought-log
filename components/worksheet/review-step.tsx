@@ -121,7 +121,7 @@ export function ReviewStep({
       <StepHeader
         step="review"
         title="Step back and look."
-        hint="This is your whole worksheet — the thoughts you circled and the patterns you named."
+        hint="Your whole worksheet: the thoughts you circled and the patterns you named."
       />
 
       <div

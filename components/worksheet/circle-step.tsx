@@ -335,7 +335,7 @@ export function CircleStep({
             </div>
             {rangeOverlaps && (
               <p className="mt-1.5 px-2 text-[0.8125rem] text-ink-faint">
-                This overlaps a marked thought — drag the handles to adjust.
+                This overlaps a marked thought. Drag the handles to adjust.
               </p>
             )}
           </div>

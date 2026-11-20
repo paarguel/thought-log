@@ -37,3 +37,24 @@ export function GhostButton({ className = "", ...props }: ButtonProps) {
     />
   );
 }
+
+/** A tappable word: feelings, sensations, needs. Selected reads as inked in. */
+export function Chip({
+  selected,
+  muted = false,
+  className = "",
+  ...props
+}: ButtonProps & { selected: boolean; muted?: boolean }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      {...props}
+      className={`min-h-10 rounded-full border px-4 text-[0.9375rem] transition-colors ${
+        selected
+          ? "border-ink bg-ink text-paper"
+          : `border-line bg-paper-raised text-ink-soft ${muted ? "opacity-45" : ""}`
+      } ${className}`}
+    />
+  );
+}

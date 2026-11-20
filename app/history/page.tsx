@@ -7,8 +7,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { Worksheet } from "@/lib/thought-log/types";
 import { worksheetTitle } from "@/lib/thought-log/types";
+import { checkInTitle, isCheckIn, type Entry } from "@/lib/check-in/types";
 import { feelingFamilies } from "@/lib/thought-log/feelings";
 import { listLocalEntries } from "@/lib/local-store/indexed-db";
 import { TopBar } from "@/components/app/top-bar";
@@ -29,18 +29,31 @@ function formatDate(iso: string): string {
 
 const MAX_CHIPS = 3;
 
-function EntryCard({ w }: { w: Worksheet }) {
-  const families = feelingFamilies(w.feelings);
+type Filter = "all" | "thoughts" | "check-ins";
+
+const FILTERS: Array<{ id: Filter; label: string }> = [
+  { id: "all", label: "All" },
+  { id: "thoughts", label: "Thoughts" },
+  { id: "check-ins", label: "Feelings" },
+];
+
+function EntryCard({ w }: { w: Entry }) {
+  const checkIn = isCheckIn(w);
+  // A check-in shows the words as picked; a worksheet rolls them up by family.
+  const families = checkIn ? w.emotions : feelingFamilies(w.feelings);
   const extra = families.length - MAX_CHIPS;
-  const thoughts = w.phrases.length;
+  const thoughts = checkIn ? 0 : w.phrases.length;
   return (
     <Link
       href={`/history/entry?id=${encodeURIComponent(w.id)}`}
       className="block rounded-xl border border-line bg-paper-raised px-4 py-3.5 active:bg-paper-sunken"
     >
       <span className="flex items-baseline justify-between gap-3">
-        <span className="truncate text-[1rem] text-ink">{worksheetTitle(w)}</span>
+        <span className="truncate text-[1rem] text-ink">
+          {checkIn ? checkInTitle(w) : worksheetTitle(w)}
+        </span>
         <span className="shrink-0 text-[0.8125rem] text-ink-faint">
+          {checkIn ? "Check-in · " : ""}
           {formatDate(w.createdAt)}
         </span>
       </span>
@@ -71,7 +84,8 @@ function EntryCard({ w }: { w: Worksheet }) {
 }
 
 export default function HistoryPage() {
-  const [local, setLocal] = useState<Worksheet[] | null>(null);
+  const [local, setLocal] = useState<Entry[] | null>(null);
+  const [filter, setFilter] = useState<Filter>("all");
 
   useEffect(() => {
     listLocalEntries()
@@ -80,6 +94,12 @@ export default function HistoryPage() {
   }, []);
 
   const empty = local !== null && local.length === 0;
+  // The filter only earns its space once there are both kinds to tell apart.
+  const mixed =
+    local !== null && local.some(isCheckIn) && local.some((e) => !isCheckIn(e));
+  const shown = (local ?? []).filter(
+    (e) => !mixed || filter === "all" || (filter === "check-ins") === isCheckIn(e)
+  );
 
   return (
     <div className="app-shell mx-auto flex w-full max-w-xl flex-col">
@@ -101,16 +121,37 @@ export default function HistoryPage() {
             <h2 className="mb-2 text-[0.75rem] uppercase tracking-[0.08em] text-ink-faint">
               On this device
             </h2>
+            {mixed && (
+              <div
+                role="group"
+                aria-label="Show"
+                className="mb-3 flex rounded-full border border-line bg-paper-raised p-1"
+              >
+                {FILTERS.map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    aria-pressed={filter === f.id}
+                    onClick={() => setFilter(f.id)}
+                    className={`min-h-9 flex-1 rounded-full text-[0.875rem] transition-colors ${
+                      filter === f.id ? "bg-ink text-paper" : "text-ink-soft"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            )}
             <ul className="flex flex-col gap-2">
-              {local.map((w) => (
+              {shown.map((w) => (
                 <li key={w.id}>
                   <EntryCard w={w} />
                 </li>
               ))}
             </ul>
             <p className="mt-4 text-[0.8125rem] leading-relaxed text-ink-faint">
-              These entries exist only on this device. Deleting the app deletes them —
-              export the ones you want to keep from the{" "}
+              These entries exist only on this device. Deleting the app deletes them.
+              Export the ones you want to keep from the{" "}
               <Link href="/data" className="underline underline-offset-4">
                 Your data
               </Link>{" "}
