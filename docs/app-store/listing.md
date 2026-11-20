@@ -107,3 +107,18 @@ never makes a network request.
 > First release. Write out a stressful moment, highlight the thoughts that
 > sting, name the thinking errors, and land on a more balanced thought —
 > all on your device, nowhere else.
+
+## What's New — 1.1.0
+
+Used for the App Store "What's New in This Version" text and the Google Play
+release notes (under Play's 500-character limit).
+
+> New: Emotion check-in. One tap from the first screen, notice what you're
+> feeling in about a minute: what happened, what you might be feeling, what
+> you notice in your body, and what you might need. Every question is
+> optional and nothing is scored.
+>
+> History is now grouped by day, with search, and thoughts and feelings are
+> easy to tell apart.
+>
+> Still 100% private. Nothing leaves your device.
