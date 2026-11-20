@@ -1,8 +1,9 @@
 "use client";
 
 /**
- * Entry detail. Renders the saved worksheet read-only (safely, as text —
- * never injected HTML), with export and delete controls.
+ * Entry detail. Renders the saved worksheet or check-in read-only (safely,
+ * as text, never injected HTML), with export and delete controls. A check-in
+ * can also be reopened and changed; a worksheet is a record and is not.
  *
  * The entry id comes from `?id=` rather than a dynamic path segment so the
  * whole app can be statically exported and bundled into the native shell.
@@ -11,15 +12,16 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import type { Worksheet } from "@/lib/thought-log/types";
 import { worksheetTitle } from "@/lib/thought-log/types";
 import { getLocalEntry, deleteLocalEntry, saveLocalEntry } from "@/lib/local-store/indexed-db";
 import {
   downloadFile,
+  entryToPrintableHtml,
   exportFilename,
   worksheetToJson,
-  worksheetToPrintableHtml,
 } from "@/lib/local-store/export";
+import { isCheckIn, type Entry } from "@/lib/check-in/types";
+import { CheckInDetail } from "@/components/check-in/check-in-detail";
 import { TopBar } from "@/components/app/top-bar";
 import { MarkedPassage } from "@/components/worksheet/review-step";
 import { NotesSection } from "@/components/entry/notes-section";
@@ -41,7 +43,7 @@ function EntryDetail() {
   const router = useRouter();
   const id = search.get("id") ?? "";
 
-  const [loaded, setLoaded] = useState<Worksheet | null | undefined>(undefined);
+  const [loaded, setLoaded] = useState<Entry | null | undefined>(undefined);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,7 +62,7 @@ function EntryDetail() {
 
   const saveNotes = async (notes: string) => {
     if (!entry) return;
-    const next: Worksheet = { ...entry, notes: notes || undefined };
+    const next: Entry = { ...entry, notes: notes || undefined };
     if (!notes) delete next.notes;
     await saveLocalEntry(next);
     setLoaded(next);
@@ -100,40 +102,46 @@ function EntryDetail() {
 
       {entry && (
         <>
-          <div className="mb-6">
-            <p className="text-[0.8125rem] text-ink-faint">
-              {new Date(entry.createdAt).toLocaleString(undefined, {
-                dateStyle: "long",
-                timeStyle: "short",
-              })}{" "}
-              · On this device
-            </p>
-            <h1 className="mt-1 font-display text-[1.5rem] leading-snug text-ink">
-              {worksheetTitle(entry)}
-            </h1>
-          </div>
+          {isCheckIn(entry) ? (
+            <CheckInDetail checkIn={entry} />
+          ) : (
+            <>
+              <div className="mb-6">
+                <p className="text-[0.8125rem] text-ink-faint">
+                  {new Date(entry.createdAt).toLocaleString(undefined, {
+                    dateStyle: "long",
+                    timeStyle: "short",
+                  })}{" "}
+                  · On this device
+                </p>
+                <h1 className="mt-1 font-display text-[1.5rem] leading-snug text-ink">
+                  {worksheetTitle(entry)}
+                </h1>
+              </div>
 
-          <Section label="Situation">
-            <p className="whitespace-pre-wrap text-[1rem] text-ink">{entry.situation || "—"}</p>
-          </Section>
+              <Section label="Situation">
+                <p className="whitespace-pre-wrap text-[1rem] text-ink">{entry.situation || "—"}</p>
+              </Section>
 
-          <Section label="Feelings">
-            <p className="text-[1rem] text-ink">
-              {entry.feelings.map((f) => f.name).join(" · ") || "—"}
-            </p>
-          </Section>
+              <Section label="Feelings">
+                <p className="text-[1rem] text-ink">
+                  {entry.feelings.map((f) => f.name).join(" · ") || "—"}
+                </p>
+              </Section>
 
-          <Section label="Thoughts">
-            <div className="write-surface">
-              <MarkedPassage worksheet={entry} />
-            </div>
-          </Section>
+              <Section label="Thoughts">
+                <div className="write-surface">
+                  <MarkedPassage worksheet={entry} />
+                </div>
+              </Section>
 
-          <Section label="A more balanced thought">
-            <p className="whitespace-pre-wrap rounded-xl bg-paper-sunken px-4 py-3 text-[1rem] text-ink">
-              {entry.rationalThought || "—"}
-            </p>
-          </Section>
+              <Section label="A more balanced thought">
+                <p className="whitespace-pre-wrap rounded-xl bg-paper-sunken px-4 py-3 text-[1rem] text-ink">
+                  {entry.rationalThought || "—"}
+                </p>
+              </Section>
+            </>
+          )}
 
           <NotesSection notes={entry.notes} onSave={saveNotes} />
 
@@ -142,7 +150,7 @@ function EntryDetail() {
               onClick={() =>
                 exportEntry(
                   exportFilename(entry, "html"),
-                  worksheetToPrintableHtml(entry, { includeNotes: false }),
+                  entryToPrintableHtml(entry, { includeNotes: false }),
                   "text/html"
                 )
               }
@@ -154,7 +162,7 @@ function EntryDetail() {
                 onClick={() =>
                   exportEntry(
                     exportFilename(entry, "html"),
-                    worksheetToPrintableHtml(entry, { includeNotes: true }),
+                    entryToPrintableHtml(entry, { includeNotes: true }),
                     "text/html"
                   )
                 }

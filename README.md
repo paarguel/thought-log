@@ -59,7 +59,14 @@ product requirement, not a setting.
 
 - A guided worksheet: situation → feelings → thoughts → circle phrases →
   label thinking patterns → review → balanced thought.
-- History, entry notes, and printable or JSON export. A "Your data" page
+- An emotion check-in, one tap from the first screen: what happened, what
+  the feeling might be, what the body is doing, what might help. Every
+  question can be skipped, nothing is scored or interpreted, and the app
+  reads it back section by section, each with a pencil to change just that
+  part. Saved check-ins can be reopened and changed the same way.
+- History grouped by day, with thoughts and feelings told apart at a glance
+  and a search across everything written.
+- Entry notes, and printable or JSON export. A "Your data" page
   backs up and restores every entry as one file.
 - Drafts that autosave on the device, so nothing is lost mid-worksheet.
 - Unit and flow tests (Vitest and Testing Library) for the reducer, phrase

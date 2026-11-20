@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { FlowAction, FlowState } from "@/lib/thought-log/reducer";
 import { FEELING_GROUPS } from "@/lib/thought-log/feelings";
+import { Chip } from "@/components/ui/buttons";
 import { dataNoticeAcknowledged } from "@/components/app/data-notice";
 import { StepFooter, StepHeader } from "./step-chrome";
 
@@ -16,13 +17,18 @@ interface StepProps {
   dispatch: React.Dispatch<FlowAction>;
 }
 
-export function SituationStep({ state, dispatch }: StepProps) {
+export function SituationStep({
+  state,
+  dispatch,
+  kindSwitch,
+}: StepProps & { kindSwitch?: React.ReactNode }) {
   return (
     <section className="step-enter flex flex-1 flex-col" aria-label="Situation">
+      {kindSwitch}
       <StepHeader
         step="situation"
         title="What happened?"
-        hint="Just the facts of the moment — where you were, what occurred."
+        hint="Just the facts of the moment: where you were, what occurred."
       />
       <textarea
         className="write-surface min-h-20 shrink grow-0 basis-36"
@@ -72,19 +78,13 @@ export function FeelingsStep({ state, dispatch }: StepProps) {
               {group.words.map((word) => {
                 const on = selected.has(word);
                 return (
-                  <button
+                  <Chip
                     key={word}
-                    type="button"
-                    aria-pressed={on}
+                    selected={on}
                     onClick={() => dispatch({ type: "toggleFeeling", name: word })}
-                    className={`min-h-10 rounded-full border px-4 text-[0.9375rem] transition-colors ${
-                      on
-                        ? "border-ink bg-ink text-paper"
-                        : "border-line bg-paper-raised text-ink-soft"
-                    }`}
                   >
                     {word}
-                  </button>
+                  </Chip>
                 );
               })}
             </div>
@@ -93,15 +93,13 @@ export function FeelingsStep({ state, dispatch }: StepProps) {
         {customFeelings.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {customFeelings.map((f) => (
-              <button
+              <Chip
                 key={f.id}
-                type="button"
-                aria-pressed
+                selected
                 onClick={() => dispatch({ type: "toggleFeeling", name: f.name })}
-                className="min-h-10 rounded-full border border-ink bg-ink px-4 text-[0.9375rem] text-paper"
               >
                 {f.name}
-              </button>
+              </Chip>
             ))}
           </div>
         )}
@@ -139,7 +137,7 @@ export function ThoughtsStep({ state, dispatch }: StepProps) {
       <StepHeader
         step="thoughts"
         title="Write it all out."
-        hint="Everything going through your head, unfiltered. Don't organize it — you'll circle the thoughts next."
+        hint="Everything going through your head, unfiltered. Don't organize it. You'll circle the thoughts next."
       />
       <textarea
         className="write-surface min-h-20 flex-1"

@@ -16,7 +16,7 @@ import {
   worksheetToJson,
   worksheetToPrintableHtml,
 } from "@/lib/local-store/export";
-import { GhostButton } from "@/components/ui/buttons";
+import { GhostButton, PrimaryButton } from "@/components/ui/buttons";
 import { StepHeader } from "./step-chrome";
 
 type DoneState =
@@ -102,13 +102,9 @@ export function SaveStep({
           <p className="mt-2 max-w-65 text-[0.9375rem] text-ink-soft">{status.message}</p>
         </div>
         <div className="flex flex-col gap-2 pb-2">
-          <button
-            type="button"
-            onClick={() => dispatch({ type: "reset" })}
-            className="min-h-13 w-full rounded-full bg-ink text-[1.0625rem] font-medium text-paper"
-          >
+          <PrimaryButton onClick={() => dispatch({ type: "reset" })}>
             Start a new entry
-          </button>
+          </PrimaryButton>
           <Link
             href="/history"
             className="min-h-11 w-full rounded-full py-2.5 text-center text-[0.9375rem] text-ink-soft"
@@ -129,12 +125,12 @@ export function SaveStep({
       />
 
       <div className="flex flex-col gap-2.5">
-        <OptionButton
-          title="Save on this device"
-          detail="Stays on this device only. Never uploaded — and gone if the app is removed."
-          onClick={saveDevice}
-          disabled={status.kind === "saving"}
-        />
+        <PrimaryButton onClick={saveDevice} disabled={status.kind === "saving"}>
+          Save on this device
+        </PrimaryButton>
+        <p className="mb-3 px-1 text-[0.875rem] text-ink-soft">
+          Stays on this device only. Never uploaded, and gone if the app is removed.
+        </p>
         <OptionButton
           title="Export printable copy"
           detail="A clean file you can keep, print, or share with a therapist."

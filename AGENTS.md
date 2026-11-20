@@ -13,9 +13,14 @@ see docs/operations/privacy.md before touching anything data-related.
 
 ## Entry points
 
-- `app/` — routes: `/` (worksheet flow), `/history`, `/history/entry?id=`,
-  `/data` (export/import/clear + disclaimers)
-- `lib/thought-log/` — domain logic (reducer, distortion catalog, segmenter)
+- `app/` — routes: `/` (first screen: a thought worksheet, or one tap to a
+  feeling check-in), `/history`, `/history/entry?id=`, `/check-in?id=`
+  (reopen a saved check-in), `/data` (export/import/clear + disclaimers)
+- `lib/thought-log/` — worksheet domain logic (reducer, distortion catalog,
+  segmenter)
+- `lib/check-in/` — emotion check-in: entry type, word lists, and the
+  reflection (string assembly only). Check-ins share the `entries` store with
+  worksheets, told apart by `kind: "check-in"`
 - `lib/local-store/` — IndexedDB persistence + file exports
 - `scripts/ios-*.sh` — release pipeline (see README and docs/app-store/)
 - `android/` — offline native shell, local document export, backup exclusions
@@ -28,6 +33,9 @@ see docs/operations/privacy.md before touching anything data-related.
   (`next.config.ts` has `output: 'export'`). Entry detail uses `?id=` for
   this reason.
 - All user text renders escaped (React text nodes / `escapeHtml` in exports).
+- The check-in never scores, interprets or requires an answer: every question
+  can be skipped, an empty check-in saves, and there are no streaks, counts
+  or "are you sure" prompts. Keep it that way.
 - Verify with `npm run lint && npm test && npm run build`.
 - iOS releases are cut from `main` with a clean worktree
   (`npm run ios:testflight`). Listing copy: docs/app-store/listing.md.

@@ -6,7 +6,9 @@ import {
   exportFilename,
   backupToJson,
   parseBackupJson,
+  checkInToPrintableHtml,
 } from "../export";
+import { newCheckIn } from "@/lib/check-in/types";
 import { newWorksheet } from "@/lib/thought-log/types";
 
 function sampleWorksheet() {
@@ -124,5 +126,49 @@ describe("notes in exports", () => {
 
     expect(parsed).toHaveLength(1);
     expect(parsed[0].notes).toBeUndefined();
+  });
+});
+
+describe("check-ins in export and backup", () => {
+  function sampleCheckIn() {
+    const c = newCheckIn("check-in-id");
+    c.createdAt = "2026-11-20T10:00:00.000Z";
+    c.updatedAt = "2026-11-20T10:01:00.000Z";
+    c.situation = "Kids were loud <script>alert(1)</script>";
+    c.emotions = ["Overwhelmed", "<b>Tired</b>"];
+    c.intensity = 6;
+    c.sensations = ["Fatigue"];
+    c.needs = ["Rest"];
+    c.notes = "private note";
+    return c;
+  }
+
+  it("prints a check-in with user text escaped and notes left out by default", () => {
+    const html = checkInToPrintableHtml(sampleCheckIn());
+    expect(html).not.toContain("<script>alert(1)</script>");
+    expect(html).not.toContain("<b>Tired</b>");
+    expect(html).toContain("Overwhelmed");
+    expect(html).toContain("I don&#39;t have to figure this out perfectly.");
+    expect(html).toContain("6 of 10");
+    expect(html).not.toContain("private note");
+    expect(checkInToPrintableHtml(sampleCheckIn(), { includeNotes: true })).toContain(
+      "private note"
+    );
+  });
+
+  it("names the file as a check-in", () => {
+    expect(exportFilename(sampleCheckIn(), "json")).toMatch(/^check-in-2026-11-20-kids-were-loud/);
+  });
+
+  it("round-trips a backup holding both kinds, selections intact", () => {
+    const entries = parseBackupJson(backupToJson([sampleWorksheet(), sampleCheckIn()]));
+    expect(entries).toHaveLength(2);
+    expect(entries[1]).toEqual(sampleCheckIn());
+    expect(parseBackupJson(worksheetToJson(sampleCheckIn()))).toEqual([sampleCheckIn()]);
+  });
+
+  it("drops a malformed check-in instead of importing it", () => {
+    const bad = { ...sampleCheckIn(), emotions: "Sad" };
+    expect(() => parseBackupJson(JSON.stringify({ entries: [bad] }))).toThrow(/any entries/);
   });
 });

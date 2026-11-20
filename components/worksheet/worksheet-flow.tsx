@@ -6,7 +6,7 @@
  * unfinished draft on return.
  */
 
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useState, type ReactNode } from "react";
 import { flowReducer, initialFlowState } from "@/lib/thought-log/reducer";
 import {
   worksheetHasContent,
@@ -47,7 +47,20 @@ type Phase =
   | { kind: "resume-prompt"; draft: Worksheet }
   | { kind: "ready" };
 
-export function WorksheetFlow() {
+export function WorksheetFlow({
+  kindSwitch,
+  seedSituation,
+  onSeedUsed,
+  onLeave,
+}: {
+  /** Render the thought/feeling switch above the first question. */
+  kindSwitch?: (leave: () => void) => ReactNode;
+  /** Situation text carried over from a check-in the user switched away from. */
+  seedSituation?: string;
+  onSeedUsed?: () => void;
+  /** Called when the user switches away; gets text worth carrying over. */
+  onLeave?: (carrySituation: string) => void;
+} = {}) {
   const [state, dispatch] = useReducer(flowReducer, undefined, initialFlowState);
   const [phase, setPhase] = useState<Phase>({ kind: "loading" });
 
@@ -58,8 +71,13 @@ export function WorksheetFlow() {
       .then((draft) => {
         if (cancelled) return;
         if (draft && worksheetHasContent(draft)) {
+          // An unfinished entry outranks carried text; the check-in keeps it.
           setPhase({ kind: "resume-prompt", draft });
         } else {
+          if (seedSituation) {
+            dispatch({ type: "setSituation", value: seedSituation });
+            onSeedUsed?.();
+          }
           setPhase({ kind: "ready" });
         }
       })
@@ -67,7 +85,22 @@ export function WorksheetFlow() {
     return () => {
       cancelled = true;
     };
+    // Mount-only: the seed is a one-time handoff.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Switching to a check-in: keep this entry as the draft, and hand over the
+  // situation when that is all there is, so it isn't typed twice.
+  const leave = () => {
+    const w = state.worksheet;
+    const onlySituation =
+      w.feelings.length === 0 && !w.thoughtText.trim() && !w.rationalThought.trim();
+    if (worksheetHasContent(w)) {
+      saveDraft(w).catch(() => {});
+      persistStep(state.step);
+    }
+    onLeave?.(onlySituation ? w.situation : "");
+  };
 
   // Autosave the draft (debounced) while the user works.
   useEffect(() => {
@@ -87,7 +120,10 @@ export function WorksheetFlow() {
   if (phase.kind === "resume-prompt") {
     const draft = phase.draft;
     return (
-      <div className="step-enter flex flex-1 flex-col justify-center px-1">
+      <div className="step-enter flex flex-1 flex-col">
+        {/* An unfinished thought shouldn't stand between you and a feeling. */}
+        {kindSwitch?.(() => onLeave?.(""))}
+        <div className="flex flex-1 flex-col justify-center px-1">
         <p className="font-display text-[1.5rem] leading-snug text-ink">
           You have an unfinished entry.
         </p>
@@ -118,12 +154,15 @@ export function WorksheetFlow() {
           </div>
         </div>
       </div>
+      </div>
     );
   }
 
   switch (state.step) {
     case "situation":
-      return <SituationStep state={state} dispatch={dispatch} />;
+      return (
+        <SituationStep state={state} dispatch={dispatch} kindSwitch={kindSwitch?.(leave)} />
+      );
     case "feelings":
       return <FeelingsStep state={state} dispatch={dispatch} />;
     case "thoughts":
