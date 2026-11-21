@@ -91,3 +91,12 @@ No physical-device test or Play pre-launch report has been completed. The report
 overview still shows the initial upload-artifacts message after internal release.
 The synthetic backup and printable export were inspected outside the repository;
 no personal journal data was used.
+
+## Release record — 1.1.0 (November 2026)
+
+- Signed bundle built November 20, 2026: versionCode 2, versionName 1.1.0.
+  Upload to production and send for review are owner steps in Play Console.
+- Listing source updated in listing.md: short description, full description,
+  release notes.
+- Six new 1080×1920 screenshots in screenshots/, captured on the Android
+  emulator with synthetic entries only. They replace the four from 1.0.1.
