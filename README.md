@@ -9,13 +9,14 @@
 | **Problem** | Cognitive behavioral therapy (CBT) asks people to write out a stressful moment, circle the distorted thoughts, and reason toward a balanced one. Paper is good at this and phones are bad at it: most apps want an account, upload your most private writing to a server, or have an AI interpret it for you. |
 | **Approach** | Copy the paper worksheet instead of reinventing it. One clear action per screen, no AI reading into your words, and a hard privacy line: no account, no server, no analytics, and no network requests at all. |
 | **What it is** | A free, open-source app on iOS, Android and the web. It is one Next.js codebase exported as a static site and wrapped with Capacitor, so all three work fully offline. |
-| **Status** | Live on the App Store and Google Play. |
+| **Status** | Live on the App Store and Google Play. Version 1.1 adds the emotion check-in; see [what's new](CHANGELOG.md). |
 
 <p>
-  <img src="docs/app-store/screenshots/01-first-launch.png" width="180" alt="First launch: the situation step">
-  <img src="docs/app-store/screenshots/02-label-thoughts.png" width="180" alt="Labeling a circled thought with a thinking pattern">
-  <img src="docs/app-store/screenshots/03-review.png" width="180" alt="Reviewing the whole worksheet">
-  <img src="docs/app-store/screenshots/05-your-data.png" width="180" alt="Exporting and backing up entries">
+  <img src="docs/app-store/screenshots/01-capture.png" width="180" alt="First screen: a thought or a feeling, then what happened">
+  <img src="docs/app-store/screenshots/04-highlight.png" width="180" alt="Circling the thoughts in what you wrote">
+  <img src="docs/app-store/screenshots/05-label.png" width="180" alt="Naming the thinking pattern in a circled thought">
+  <img src="docs/app-store/screenshots/03-reflection.png" width="180" alt="An emotion check-in read back section by section">
+  <img src="docs/app-store/screenshots/06-history.png" width="180" alt="History grouped by day, thoughts and feelings told apart">
 </p>
 
 ## The problem
@@ -140,7 +141,7 @@ then `npx @capacitor/assets generate --ios`.
 ## Android / Google Play
 
 The same offline static app is bundled into `android/`, package
-`com.urbanpyx.thinkingerrors`, version 1.0.1 (version code 1).
+`com.urbanpyx.thinkingerrors`, version 1.1.0 (version code 2).
 
 ```bash
 npm run android:sync     # build web and copy into Android
