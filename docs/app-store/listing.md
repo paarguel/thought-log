@@ -24,11 +24,9 @@ single source of truth; edit here first, then update ASC.
 
 ## Promotional text (170 chars max)
 
-> A quiet, paper-like notepad for CBT thought records. Write it out, highlight
-> the thoughts, name the thinking errors. 100% private — nothing leaves your
-> device.
+> Thought records and one-minute emotion check-ins on quiet, paper-like pages. Highlight thoughts, name thinking errors, notice feelings. 100% private, on your device.
 
-(166 chars)
+(165 chars)
 
 ## Description
 
@@ -51,6 +49,16 @@ single source of truth; edit here first, then update ASC.
 > FIND A MORE BALANCED THOUGHT
 > Re-read what you wrote with the labels in view, then write the calmer,
 > fairer version.
+>
+> CHECK IN WITH A FEELING
+> Not every moment needs a full worksheet. One tap from the first screen,
+> notice what happened, what you might be feeling, what your body is doing,
+> and what you might need. It takes about a minute. Every question is
+> optional, and nothing is scored.
+>
+> FIND IT AGAIN
+> History is grouped by day, with search, and thoughts and feelings are easy
+> to tell apart.
 >
 > PRIVATE BY ARCHITECTURE
 > • No account, no sign-in, no server — the app never makes a network request
@@ -122,3 +130,9 @@ release notes (under Play's 500-character limit).
 > easy to tell apart.
 >
 > Still 100% private. Nothing leaves your device.
+
+## What's New — 1.1.1
+
+> Housekeeping: refreshed App Store screenshots and description. The emotion
+> check-in and day-grouped history arrived in 1.1.0. Nothing else changed,
+> and nothing leaves your device.

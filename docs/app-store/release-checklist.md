@@ -43,7 +43,7 @@ web UI. Listing copy lives in [listing.md](listing.md).
 
 - [ ] Screenshots: ready-made in [screenshots/](screenshots/) —
       captured on the iPhone 17 Pro Max simulator at 1320×2868 (6.9" class):
-      first-launch notice, labeling, review, history, your-data.
+      first screen, feeling, reflection, highlight, label, history.
       Retake any time with `xcrun simctl io booted screenshot`.
 - [ ] Paste subtitle, promotional text, description, keywords from listing.md
 - [ ] Support URL + privacy policy URL (see listing.md)
@@ -52,3 +52,15 @@ web UI. Listing copy lives in [listing.md](listing.md).
 - [ ] Pricing: Free, all territories (or select)
 - [ ] App Review notes from listing.md
 - [ ] Select the processed build → Submit for Review
+
+## Release record — 1.1.x (November 2026)
+
+- 1.1.0 (build 10): emotion check-in and day-grouped, searchable history.
+  Submitted and approved November 20, 2026; released the same day.
+  Apple's new age-rating question "social media" answered No (the app has no
+  network access).
+- 1.1.1 (build 11): no code change. Carries the refreshed description and six
+  new screenshots, because Apple locks both once a version is live. Set to
+  release automatically after approval.
+- Promotional text was updated on the live listing on November 20, 2026.
+- Screenshots use synthetic entries only.

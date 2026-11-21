@@ -16,7 +16,7 @@ Submission status is tracked separately in release-checklist.md.
 
 ## Short description
 
-Private CBT thought records. Spot thinking errors and find a balanced thought.
+Private CBT thought records and quick emotion check-ins, all on your device.
 
 ## Full description
 
@@ -34,6 +34,12 @@ Label each highlighted thought with common thinking errors (cognitive distortion
 FIND A MORE BALANCED THOUGHT
 Re-read what you wrote with the labels in view, then write the calmer, fairer version. Add notes to saved entries when you have something to revisit.
 
+CHECK IN WITH A FEELING
+Not every moment needs a full worksheet. One tap from the first screen, notice what happened, what you might be feeling, what your body is doing, and what you might need. It takes about a minute. Every question is optional, and nothing is scored.
+
+FIND IT AGAIN
+History is grouped by day, with search, and thoughts and feelings are easy to tell apart.
+
 PRIVATE BY ARCHITECTURE
 • No account, no sign-in, no server — the app never makes a network request
 • Everything you write stays on your device
@@ -47,7 +53,13 @@ Thought Record is free and open source. It is a self-help writing tool, not ther
 
 ## Release notes (en-US)
 
-First Android release. Write out a stressful moment, highlight thoughts, name thinking errors, and find a more balanced thought. Save entries, add notes, and export backups — all on your device.
+1.1.0:
+
+New: Emotion check-in. One tap from the first screen, notice what you're feeling in about a minute: what happened, what you might be feeling, what you notice in your body, and what you might need. Every question is optional and nothing is scored.
+
+History is now grouped by day, with search, and thoughts and feelings are easy to tell apart.
+
+Still 100% private. Nothing leaves your device.
 
 ## App content answers supported by source
 
