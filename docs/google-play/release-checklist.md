@@ -96,8 +96,8 @@ no personal journal data was used.
 
 - Signed bundle built November 20, 2026: versionCode 2, versionName 1.1.0.
   Uploaded to production as release "2 (1.1.0)" with en-US release notes and
-  saved in Publishing overview. Not yet sent for review: sending restarts
-  the trader-status review already in progress, so that is the owner's call.
+  sent for review on November 20, 2026 (full rollout, managed publishing off, so it
+  publishes when approved). The trader-status review had already finished.
 - Store listing draft saved in Console: new short description, full
   description, and six phone screenshots replacing the four from 1.0.1.
   Saving it for review needs the owner's AI asset declaration.
