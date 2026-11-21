@@ -59,7 +59,7 @@ web UI. Listing copy lives in [listing.md](listing.md).
   Submitted and approved November 20, 2026; released the same day.
   Apple's new age-rating question "social media" answered No (the app has no
   network access).
-- 1.1.1 (build 11): no code change. Carries the refreshed description and six
+- 1.1.1 (build 12): no code change. Submitted November 20, 2026. Carries the refreshed description and six
   new screenshots, because Apple locks both once a version is live. Set to
   release automatically after approval.
 - Promotional text was updated on the live listing on November 20, 2026.

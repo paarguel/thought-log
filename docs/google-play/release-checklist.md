@@ -95,8 +95,11 @@ no personal journal data was used.
 ## Release record — 1.1.0 (November 2026)
 
 - Signed bundle built November 20, 2026: versionCode 2, versionName 1.1.0.
-  Upload to production and send for review are owner steps in Play Console.
-- Listing source updated in listing.md: short description, full description,
-  release notes.
-- Six new 1080×1920 screenshots in screenshots/, captured on the Android
-  emulator with synthetic entries only. They replace the four from 1.0.1.
+  Uploaded to production as release "2 (1.1.0)" with en-US release notes and
+  saved in Publishing overview. Not yet sent for review: sending restarts
+  the trader-status review already in progress, so that is the owner's call.
+- Store listing draft saved in Console: new short description, full
+  description, and six phone screenshots replacing the four from 1.0.1.
+  Saving it for review needs the owner's AI asset declaration.
+- Listing source of truth is listing.md; screenshots are in screenshots/
+  (1080×1920, Android emulator, synthetic entries only).
