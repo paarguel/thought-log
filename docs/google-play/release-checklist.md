@@ -128,8 +128,10 @@ no personal journal data was used.
   production rollout together with three default English listing changes
   (short description, full description and phone screenshots).
 - Quick checks finished and Play Console confirmed all four changes were in
-  review. Managed publishing was off at submission.
-  [Publishing overview](https://play.google.com/console/u/0/developers/7257870420459558056/app/4975077118867870359/publishing)
+  review. With managed publishing off, Google published production version
+  1.1.0 and the updated listing on November 25 at 10:10 PM Pacific. The public
+  listing showed the updated short description and offline-use copy.
+  [Submission activity](https://play.google.com/console/u/0/developers/7257870420459558056/app/4975077118867870359/publishing/submission-activity/5/details)
 
 ## Resubmit after an accepted appeal
 
