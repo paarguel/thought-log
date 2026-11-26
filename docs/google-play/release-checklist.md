@@ -45,14 +45,24 @@ npm run android:release
 ```
 
 The script runs lint, tests, static build, Capacitor Android sync, Android
-release lint, bundle signing, signature verification, and a SHA-256 digest.
-Increment `versionCode` in `android/app/build.gradle` for every later upload.
+release lint, signing and signature verification. It checks the AAB for the
+Internet permission, Android backup and a remote Capacitor server URL, then
+prints the package, version and SHA-256 digest. Increment `versionCode` in
+`android/app/build.gradle` for each replacement bundle uploaded to Google Play.
+
+To check a previously built AAB without rebuilding it:
+
+```bash
+bash scripts/android-check-offline-bundle.sh /path/to/app-release.aab
+shasum -a 256 /path/to/app-release.aab
+```
 
 ## Before upload
 
 - [x] Accept SDK licenses and install required packages.
 - [x] Native `lintRelease`, `assembleRelease`, and signed `bundleRelease` pass.
-- [x] Inspect merged release manifest: no Internet permission; backup disabled.
+- [x] Inspect the signed release bundle: no Internet permission, Android backup
+      disabled, no remote Capacitor server URL.
 - [x] Android smoke: first-launch notice, worksheet, highlighting/labels, save,
       history/detail, notes, navigation/back button, keyboard and safe areas.
 - [x] Export JSON and printable HTML through local picker; cancellation must not
@@ -100,6 +110,45 @@ no personal journal data was used.
   publishes when approved). The trader-status review had already finished.
 - Store listing draft saved in Console: new short description, full
   description, and six phone screenshots replacing the four from 1.0.1.
-  Saving it for review needs the owner's AI asset declaration.
+  The November 25 resubmission below includes these listing changes.
 - Listing source of truth is listing.md; screenshots are in screenshots/
   (1080×1920, Android emulator, synthetic entries only).
+
+### November 25 appeal and resubmission
+
+- Google accepted the appeal of its email-address Data safety finding. Policy
+  status listed that finding for version code 2 and showed no other issues.
+- Inspected the signed local 1.1.0 AAB (version code 2). Its manifest omits
+  Internet permission and disables backup, and its Capacitor configuration
+  loads bundled files. The app has no email field. The Android export writes
+  through the local document picker only when the user chooses a destination.
+  The existing Play declaration says the app collects and shares no user data.
+- Saved listing copy explaining that no email is required and describing how
+  the file picker handles exports. Sent the existing 1.1.0 release for 100%
+  production rollout together with three default English listing changes
+  (short description, full description and phone screenshots).
+- Quick checks finished and Play Console confirmed all four changes were in
+  review. With managed publishing off, Google published production version
+  1.1.0 and the updated listing on November 25 at 10:10 PM Pacific. The public
+  listing showed the updated short description and offline-use copy.
+  [Submission activity](https://play.google.com/console/u/0/developers/7257870420459558056/app/4975077118867870359/publishing/submission-activity/5/details)
+
+## Resubmit after an accepted appeal
+
+1. Read the appeal decision and open **Policy status**. Check for additional
+   violations and compare any Data safety finding with the affected build and
+   active tracks. Verify the signed bundle and check how account fields, SDKs,
+   local storage and user-initiated exports handle the affected data type.
+   [Google Play Data safety guidance](https://support.google.com/googleplay/android-developer/answer/10787469)
+2. If Play offers the appealed, compliant bundle in **Publishing overview**,
+   verify its track, version and rollout before resubmitting it. If the app
+   needs a binary fix, use a higher version code on every affected track and
+   follow the rollout specified in the decision.
+3. If listing changes are needed, edit the listing, select **Next** to review,
+   check the visual asset declaration against the artwork and screenshots,
+   and select **Save** to stage the changes.
+4. Check the full submission in **Publishing overview**. Submit for review and
+   verify the resulting status after quick checks finish. Record the date, track,
+   version code, rollout, listing and declaration changes, and the status Play
+   actually shows. Managed publishing controls what happens after approval.
+   [Google Play Publishing overview guidance](https://support.google.com/googleplay/android-developer/answer/9859654)

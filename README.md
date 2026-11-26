@@ -146,7 +146,7 @@ The same offline static app is bundled into `android/`, package
 ```bash
 npm run android:sync     # build web and copy into Android
 npm run android:open     # optional: open Android Studio
-npm run android:release  # checks, signed release bundle, native lint
+npm run android:release  # checks, native lint, signed bundle, offline bundle verification
 ```
 
 Requires JDK 21 and Android SDK 36. Signing keys live outside the repo in
