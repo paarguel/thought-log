@@ -14,5 +14,6 @@ npm run android:sync
 (cd android && ./gradlew --no-daemon lintRelease bundleRelease)
 bundle="android/app/build/outputs/bundle/release/app-release.aab"
 "$JAVA_HOME/bin/jarsigner" -verify "$bundle"
+bash scripts/android-check-offline-bundle.sh "$bundle"
 shasum -a 256 "$bundle"
 echo "Upload: $PWD/$bundle"

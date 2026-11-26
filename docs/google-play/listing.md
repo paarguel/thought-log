@@ -41,10 +41,10 @@ FIND IT AGAIN
 History is grouped by day, with search, and thoughts and feelings are easy to tell apart.
 
 PRIVATE BY ARCHITECTURE
-• No account, no sign-in, no server — the app never makes a network request
-• Everything you write stays on your device
+• No account or email address required. The app works offline and never makes a network request.
+• Thought records and check-ins are saved on your device.
 • No analytics, no ads, no AI reading your words
-• Export a clean printable copy to keep or share with your therapist, or a JSON backup of everything
+• You can save a printable copy or a JSON backup using Android’s file picker. You choose what to do with the exported file.
 
 AN HONEST NOTE ABOUT YOUR DATA
 Because entries live only on your device, deleting the app deletes them. Export regularly — this is a working notepad, not long-term storage.
